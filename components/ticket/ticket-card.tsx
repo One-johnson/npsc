@@ -1,4 +1,5 @@
-import { CheckCircle2, Clock, QrCode } from "lucide-react";
+import { CheckCircle2, Clock, CreditCard } from "lucide-react";
+import { TicketQrCode } from "@/components/ticket/ticket-qr-code";
 import {
   Card,
   CardContent,
@@ -12,13 +13,15 @@ type TicketCardProps = {
   attendeeName?: string;
   tierName?: string;
   confirmationCode?: string;
-  variant?: "confirmed" | "waitlisted";
+  variant?: "confirmed" | "pending" | "waitlisted";
   waitlistPosition?: number;
   eventTitleLine2?: string;
   edition?: string;
   dateShort?: string;
   venue?: string;
   city?: string;
+  /** Signed payload for check-in QR (confirmed tickets only). */
+  qrPayload?: string;
 };
 
 export function TicketCard({
@@ -32,32 +35,60 @@ export function TicketCard({
   dateShort = "",
   venue = "",
   city = "",
+  qrPayload,
 }: TicketCardProps) {
   const isWaitlisted = variant === "waitlisted";
+  const isPending = variant === "pending";
 
   return (
     <Card
       className={`mx-auto max-w-md shadow-lg ring-2 ${
-        isWaitlisted ? "ring-amber-500/30" : "ring-primary/20"
+        isWaitlisted
+          ? "ring-amber-500/30"
+          : isPending
+            ? "ring-sky-500/30"
+            : "ring-primary/20"
       }`}
     >
-      <CardHeader className={isWaitlisted ? "bg-amber-500/10" : "bg-primary/5"}>
+      <CardHeader
+        className={
+          isWaitlisted
+            ? "bg-amber-500/10"
+            : isPending
+              ? "bg-sky-500/10"
+              : "bg-primary/5"
+        }
+      >
         <div
           className={`flex items-center gap-2 ${
-            isWaitlisted ? "text-amber-700 dark:text-amber-400" : "text-primary"
+            isWaitlisted
+              ? "text-amber-700 dark:text-amber-400"
+              : isPending
+                ? "text-sky-700 dark:text-sky-400"
+                : "text-primary"
           }`}
         >
           {isWaitlisted ? (
             <Clock className="size-5" />
+          ) : isPending ? (
+            <CreditCard className="size-5" />
           ) : (
             <CheckCircle2 className="size-5" />
           )}
           <span className="text-sm font-medium">
-            {isWaitlisted ? "On the waitlist" : "Registration confirmed"}
+            {isWaitlisted
+              ? "On the waitlist"
+              : isPending
+                ? "Awaiting payment"
+                : "Registration confirmed"}
           </span>
         </div>
         <CardTitle className="text-xl">
-          {isWaitlisted ? "You’re on the waitlist" : "You’re registered!"}
+          {isWaitlisted
+            ? "You’re on the waitlist"
+            : isPending
+              ? "Complete payment to confirm"
+              : "You’re registered!"}
         </CardTitle>
         <CardDescription>{eventTitleLine2}</CardDescription>
         {isWaitlisted && waitlistPosition !== undefined ? (
@@ -101,16 +132,21 @@ export function TicketCard({
             No check-in QR yet — complete payment when you are promoted from the
             waitlist.
           </p>
-        ) : (
+        ) : isPending ? (
+          <p className="rounded-lg border border-sky-500/20 bg-sky-500/5 px-3 py-2 text-center text-xs text-muted-foreground">
+            Your seat is reserved. Complete payment below to confirm your
+            registration and receive your check-in QR code.
+          </p>
+        ) : qrPayload ? (
           <>
-            <div className="mx-auto flex aspect-square max-w-[200px] items-center justify-center rounded-xl border-2 border-dashed border-primary/30 bg-muted/50">
-              <QrCode className="size-28 text-primary/40" />
+            <div className="mx-auto flex justify-center rounded-xl border border-primary/20 bg-white p-3">
+              <TicketQrCode value={qrPayload} size={200} />
             </div>
             <p className="text-center text-xs text-muted-foreground">
               Present this QR code at check-in
             </p>
           </>
-        )}
+        ) : null}
       </CardContent>
     </Card>
   );

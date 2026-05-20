@@ -16,6 +16,25 @@ export const ticketTypeKindValidator = v.union(
   v.literal("media")
 );
 
+export const paymentMethodValidator = v.union(
+  v.literal("momo"),
+  v.literal("card"),
+  v.literal("bank"),
+  v.literal("other")
+);
+
+export const paymentProviderValidator = v.union(
+  v.literal("mock"),
+  v.literal("manual"),
+  v.literal("hubtel")
+);
+
+export const paymentStatusValidator = v.union(
+  v.literal("completed"),
+  v.literal("failed"),
+  v.literal("refunded")
+);
+
 const organizerValidator = v.object({
   name: v.string(),
   logo: v.string(),
@@ -164,4 +183,21 @@ export default defineSchema({
     .index("by_event", ["eventId"])
     .index("by_confirmation", ["confirmationCode"])
     .index("by_event_email", ["eventId", "email"]),
+
+  payments: defineTable({
+    registrationId: v.id("registrations"),
+    eventId: v.id("events"),
+    amount: v.number(),
+    currency: v.string(),
+    method: paymentMethodValidator,
+    provider: paymentProviderValidator,
+    status: paymentStatusValidator,
+    externalReference: v.optional(v.string()),
+    recordedByUserId: v.optional(v.id("users")),
+    paidAt: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_registration", ["registrationId"])
+    .index("by_event", ["eventId"])
+    .index("by_event_paid_at", ["eventId", "paidAt"]),
 });

@@ -60,15 +60,19 @@ export function RegistrationDialog({
   }, [ticket.id, form]);
 
   async function onSubmit(data: AttendeeRegistrationData) {
-    await onSuccess({ ...data, ticketTypeId: ticket.id });
-    form.reset({
-      ticketTypeId: ticket.id,
-      fullName: "",
-      email: "",
-      phone: "",
-      organization: "",
-      position: "",
-    });
+    try {
+      await onSuccess({ ...data, ticketTypeId: ticket.id });
+      form.reset({
+        ticketTypeId: ticket.id,
+        fullName: "",
+        email: "",
+        phone: "",
+        organization: "",
+        position: "",
+      });
+    } catch {
+      // Parent shows overlay error via toast; keep form data for retry.
+    }
   }
 
   return (

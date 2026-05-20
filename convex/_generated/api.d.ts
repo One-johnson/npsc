@@ -17,6 +17,8 @@ import type * as lib_rbac from "../lib/rbac.js";
 import type * as lib_session from "../lib/session.js";
 import type * as lib_staffId from "../lib/staffId.js";
 import type * as lib_staffUsers from "../lib/staffUsers.js";
+import type * as lib_ticketQr from "../lib/ticketQr.js";
+import type * as payments from "../payments.js";
 import type * as registrations from "../registrations.js";
 import type * as seed from "../seed.js";
 import type * as ticketTypes from "../ticketTypes.js";
@@ -37,6 +39,8 @@ declare const fullApi: ApiFromModules<{
   "lib/session": typeof lib_session;
   "lib/staffId": typeof lib_staffId;
   "lib/staffUsers": typeof lib_staffUsers;
+  "lib/ticketQr": typeof lib_ticketQr;
+  payments: typeof payments;
   registrations: typeof registrations;
   seed: typeof seed;
   ticketTypes: typeof ticketTypes;

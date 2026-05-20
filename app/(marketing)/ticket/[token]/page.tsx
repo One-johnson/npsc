@@ -5,10 +5,12 @@ import { mockEvent } from "@/lib/mock-event";
 
 type Props = {
   params: Promise<{ token: string }>;
+  searchParams: Promise<{ pay?: string }>;
 };
 
-export default async function TicketPage({ params }: Props) {
+export default async function TicketPage({ params, searchParams }: Props) {
   const { token } = await params;
+  const { pay } = await searchParams;
   const decoded = decodeURIComponent(token);
 
   return (
@@ -19,7 +21,7 @@ export default async function TicketPage({ params }: Props) {
           <p className="mt-2 text-sm text-muted-foreground">
             {mockEvent.titleLine2} · {mockEvent.dateShort}
           </p>
-          <TicketPageContent token={decoded} />
+          <TicketPageContent token={decoded} openPayment={pay === "1"} />
         </div>
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Button variant="outline" disabled>
