@@ -4,6 +4,10 @@ import { mutation, query } from "./_generated/server";
 import type { DataModel, Id } from "./_generated/dataModel";
 import { canManageEvents, canViewRegistrations, requireAuth } from "./lib/rbac";
 import {
+  getTicketQrSigningSecret,
+  signTicketQrPayload,
+} from "./lib/ticketQr";
+import {
   ticketTypeKindValidator,
   userRoleValidator,
 } from "./schema";
@@ -47,6 +51,8 @@ export const registerAttendee = mutation({
     phone: v.string(),
     organization: v.optional(v.string()),
     position: v.optional(v.string()),
+    /** When true, registration is confirmed immediately (e.g. after payment). */
+    paymentCompleted: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const event = await ctx.db
@@ -77,6 +83,11 @@ export const registerAttendee = mutation({
       if (existing.status === "waitlisted") {
         throw new Error("This email is already on the waitlist for this event");
       }
+      if (existing.status === "pending") {
+        throw new Error(
+          "This email already has a registration awaiting payment. Complete payment using your confirmation code or contact support."
+        );
+      }
       throw new Error("This email is already registered for this event");
     }
 
@@ -88,6 +99,7 @@ export const registerAttendee = mutation({
     const confirmationCode = generateConfirmationCode();
 
     if (hasSpot) {
+      const paid = args.paymentCompleted === true;
       const registrationId = await ctx.db.insert("registrations", {
         eventId: event._id,
         ticketTypeId: ticketType._id,
@@ -98,7 +110,7 @@ export const registerAttendee = mutation({
         organization: args.organization?.trim() || undefined,
         position: args.position?.trim() || undefined,
         confirmationCode,
-        status: "pending",
+        status: paid ? "confirmed" : "pending",
         createdAt: now,
       });
 
@@ -110,7 +122,7 @@ export const registerAttendee = mutation({
       });
 
       return {
-        outcome: "confirmed" as const,
+        outcome: paid ? ("confirmed" as const) : ("pending" as const),
         registrationId,
         confirmationCode,
         ticketTypeName: ticketType.name,
@@ -185,7 +197,15 @@ export const getByConfirmationCode = query({
         registration.createdAt
       );
     }
-    return { registration, event, ticketType, waitlistPosition };
+    let qrPayload: string | undefined;
+    if (registration.status === "confirmed") {
+      qrPayload = await signTicketQrPayload(
+        registration._id,
+        registration.confirmationCode,
+        getTicketQrSigningSecret()
+      );
+    }
+    return { registration, event, ticketType, waitlistPosition, qrPayload };
   },
 });
 

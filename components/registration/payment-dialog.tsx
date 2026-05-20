@@ -26,7 +26,7 @@ type Props = {
   registration: PendingRegistration;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onComplete: () => void | Promise<void>;
+  onComplete: (data: PaymentData) => void | Promise<void>;
 };
 
 export function PaymentDialog({
@@ -50,9 +50,10 @@ export function PaymentDialog({
     setError(null);
     setSubmitting(true);
     try {
-      await onComplete();
+      await onComplete(_data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Payment failed");
+    } finally {
       setSubmitting(false);
     }
   }

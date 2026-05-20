@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -41,6 +42,7 @@ type Props = {
 };
 
 export function EventRegistrationPage({ data }: Props) {
+  const router = useRouter();
   const { event, ticketTypes } = data;
   const eventFull = event.registeredCount >= event.capacity;
   const registerAttendee = useMutation(api.registrations.registerAttendee);
@@ -78,6 +80,11 @@ export function EventRegistrationPage({ data }: Props) {
   async function onSubmit(values: AttendeeRegistrationData) {
     setError(null);
     setSuccess(null);
+    const ticket =
+      ticketTypes.find((t) => t.id === values.ticketTypeId) ?? activeTicket;
+    const waitlistOnly =
+      eventFull || (ticket && ticket.soldCount >= ticket.capacity);
+
     try {
       const result = await registerAttendee({
         eventSlug: event.slug,
@@ -87,14 +94,20 @@ export function EventRegistrationPage({ data }: Props) {
         phone: values.phone,
         organization: values.organization,
         position: values.position,
+        paymentCompleted: waitlistOnly ? undefined : false,
       });
       if (result.outcome === "waitlisted") {
         setSuccess(
           `You’re on the waitlist (position ${result.waitlistPosition}). Save this code: ${result.confirmationCode}`
         );
+      } else if (result.outcome === "pending") {
+        router.push(
+          `/ticket/${encodeURIComponent(result.confirmationCode)}?pay=1`
+        );
+        return;
       } else {
         setSuccess(
-          `Registration received. Confirmation: ${result.confirmationCode}`
+          `Registration confirmed. Confirmation: ${result.confirmationCode}`
         );
       }
       form.reset({
@@ -103,6 +116,7 @@ export function EventRegistrationPage({ data }: Props) {
         email: "",
         phone: "",
         organization: "",
+        position: "",
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");

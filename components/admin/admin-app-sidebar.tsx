@@ -7,6 +7,7 @@ import {
   CalendarDays,
   LayoutDashboard,
   LogOut,
+  CreditCard,
   UserCheck,
   Users,
 } from "lucide-react";
@@ -33,7 +34,13 @@ const nav = [
     href: "/admin/participants",
     label: "Participants",
     icon: UserCheck,
-    roles: ["admin", "checkin"] as const,
+    roles: ["admin", "finance", "checkin"] as const,
+  },
+  {
+    href: "/admin/payments",
+    label: "Payments",
+    icon: CreditCard,
+    roles: ["admin", "finance"] as const,
   },
   {
     href: "/admin/staff",

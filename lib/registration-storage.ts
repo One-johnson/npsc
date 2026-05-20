@@ -18,7 +18,8 @@ export function savePendingRegistration(
   eventSlug: string,
   ticket: TicketTypeOption,
   data: AttendeeRegistrationData,
-  isLive: boolean
+  isLive: boolean,
+  confirmationCode?: string
 ): PendingRegistration {
   const pending: PendingRegistration = {
     ...data,
@@ -30,6 +31,7 @@ export function savePendingRegistration(
     currency: ticket.currency,
     isLive,
     createdAt: new Date().toISOString(),
+    confirmationCode,
   };
   if (typeof window !== "undefined") {
     sessionStorage.setItem(KEY, JSON.stringify(pending));

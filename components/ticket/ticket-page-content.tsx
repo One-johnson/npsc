@@ -1,23 +1,52 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
 import { useQuery } from "convex/react";
 import { Button } from "@/components/ui/button";
 import { TicketCard } from "@/components/ticket/ticket-card";
+import { TicketPendingPayment } from "@/components/ticket/ticket-pending-payment";
 import { api } from "@/convex/_generated/api";
+import { useConferenceEvent } from "@/hooks/use-conference-event";
 import { mockEvent } from "@/lib/mock-event";
+import type { PendingRegistration } from "@/lib/registration-storage";
 
 type Props = {
   token: string;
+  openPayment?: boolean;
 };
 
-export function TicketPageContent({ token }: Props) {
+export function TicketPageContent({ token, openPayment = false }: Props) {
   const isDemo = token === "demo";
   const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
   const lookup = useQuery(
     api.registrations.getByConfirmationCode,
     !isDemo && convexUrl ? { confirmationCode: token } : "skip"
   );
+
+  const eventSlug = lookup?.event.slug ?? mockEvent.slug;
+  const { bundle } = useConferenceEvent(eventSlug);
+
+  const pendingCheckout = useMemo((): PendingRegistration | null => {
+    if (!lookup || lookup.registration.status !== "pending") return null;
+    const { registration, event, ticketType } = lookup;
+    return {
+      ticketTypeId: registration.ticketTypeId,
+      fullName: registration.fullName,
+      email: registration.email,
+      phone: registration.phone,
+      organization: registration.organization ?? "",
+      position: registration.position ?? "",
+      eventSlug: event.slug,
+      ticketTypeName: ticketType.name,
+      ticketKind: registration.ticketKind,
+      price: ticketType.price,
+      currency: ticketType.currency,
+      isLive: true,
+      createdAt: new Date(registration.createdAt).toISOString(),
+      confirmationCode: registration.confirmationCode,
+    };
+  }, [lookup]);
 
   if (isDemo) {
     return (
@@ -69,8 +98,16 @@ export function TicketPageContent({ token }: Props) {
     );
   }
 
-  const { registration, event, ticketType, waitlistPosition } = lookup;
+  const { registration, event, ticketType, waitlistPosition, qrPayload } =
+    lookup;
   const isWaitlisted = registration.status === "waitlisted";
+  const isPending = registration.status === "pending";
+
+  const variant = isWaitlisted
+    ? "waitlisted"
+    : isPending
+      ? "pending"
+      : "confirmed";
 
   return (
     <div className="mt-10">
@@ -78,14 +115,22 @@ export function TicketPageContent({ token }: Props) {
         attendeeName={registration.fullName}
         tierName={ticketType.name}
         confirmationCode={registration.confirmationCode}
-        variant={isWaitlisted ? "waitlisted" : "confirmed"}
+        variant={variant}
         waitlistPosition={waitlistPosition}
         eventTitleLine2={event.titleLine2}
         edition={event.edition}
         dateShort={event.dateShort}
         venue={event.venue}
         city={event.city}
+        qrPayload={qrPayload}
       />
+      {isPending && pendingCheckout ? (
+        <TicketPendingPayment
+          bundle={bundle}
+          registration={pendingCheckout}
+          autoOpen={openPayment}
+        />
+      ) : null}
     </div>
   );
 }
