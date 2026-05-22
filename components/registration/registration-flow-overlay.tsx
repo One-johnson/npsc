@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Loader2, Mail } from "lucide-react";
+import { CheckCircle2, ClipboardList, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +19,7 @@ export type RegistrationFlowOverlayPhase =
 
 export type RegistrationFlowOverlayState = {
   phase: RegistrationFlowOverlayPhase;
-  email?: string;
+  confirmationCode?: string;
 };
 
 const COPY: Record<
@@ -42,12 +42,12 @@ const COPY: Record<
   "payment-success": {
     title: "Thank you for registering",
     description:
-      "Your registration is confirmed. We have sent the details to your email — please check your inbox (and spam folder) for your confirmation and QR code for check-in.",
+      "Your registration is confirmed. Save your reference code — you will use it to check status and download your certificate when issued.",
   },
   "waitlist-complete": {
     title: "You’re on the waitlist",
     description:
-      "Your registration has been saved. Redirecting you to your waitlist confirmation…",
+      "Your registration has been saved. Redirecting you to your registration status page…",
   },
 };
 
@@ -81,17 +81,19 @@ export function RegistrationFlowOverlay({ state }: Props) {
             ) : state.phase === "payment-success" ? (
               <CheckCircle2 className="size-8 text-primary" />
             ) : (
-              <Mail className="size-8 text-primary" />
+              <ClipboardList className="size-8 text-primary" />
             )}
           </div>
           <DialogTitle className="text-xl">{title}</DialogTitle>
           <DialogDescription className="text-base leading-relaxed">
             {description}
           </DialogDescription>
-          {state.phase === "payment-success" && state.email ? (
+          {state.phase === "payment-success" && state.confirmationCode ? (
             <p className="text-sm text-muted-foreground">
-              Sent to{" "}
-              <span className="font-medium text-foreground">{state.email}</span>
+              Reference{" "}
+              <span className="font-mono font-medium text-foreground">
+                {state.confirmationCode}
+              </span>
             </p>
           ) : null}
         </DialogHeader>

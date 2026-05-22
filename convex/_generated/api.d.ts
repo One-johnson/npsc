@@ -9,6 +9,7 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as certificates from "../certificates.js";
 import type * as events from "../events.js";
 import type * as files from "../files.js";
 import type * as lib_eventDefaults from "../lib/eventDefaults.js";
@@ -17,7 +18,6 @@ import type * as lib_rbac from "../lib/rbac.js";
 import type * as lib_session from "../lib/session.js";
 import type * as lib_staffId from "../lib/staffId.js";
 import type * as lib_staffUsers from "../lib/staffUsers.js";
-import type * as lib_ticketQr from "../lib/ticketQr.js";
 import type * as payments from "../payments.js";
 import type * as registrations from "../registrations.js";
 import type * as seed from "../seed.js";
@@ -31,6 +31,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  certificates: typeof certificates;
   events: typeof events;
   files: typeof files;
   "lib/eventDefaults": typeof lib_eventDefaults;
@@ -39,7 +40,6 @@ declare const fullApi: ApiFromModules<{
   "lib/session": typeof lib_session;
   "lib/staffId": typeof lib_staffId;
   "lib/staffUsers": typeof lib_staffUsers;
-  "lib/ticketQr": typeof lib_ticketQr;
   payments: typeof payments;
   registrations: typeof registrations;
   seed: typeof seed;

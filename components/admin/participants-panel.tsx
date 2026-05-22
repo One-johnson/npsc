@@ -167,6 +167,17 @@ export function ParticipantsPanel() {
         eventId={eventId}
         statusFilter={statusFilter}
         ticketFilter={ticketFilter}
+        certificateEvent={
+          selectedEvent
+            ? {
+                titleLine2: selectedEvent.titleLine2,
+                edition: selectedEvent.edition,
+                date: selectedEvent.date,
+                venue: selectedEvent.venue,
+                city: selectedEvent.city,
+              }
+            : null
+        }
       />
     </div>
   );

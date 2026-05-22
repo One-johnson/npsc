@@ -28,10 +28,9 @@ export type StaffMemberRow = {
 const ROLE_LABELS: Record<StaffRole, string> = {
   admin: "Admin",
   finance: "Finance",
-  checkin: "Check-in",
 };
 
-const ASSIGNABLE_ROLES: StaffRole[] = ["finance", "checkin"];
+const ASSIGNABLE_ROLES: StaffRole[] = ["finance"];
 
 type StaffColumnsOptions = {
   currentUserId?: Id<"users">;

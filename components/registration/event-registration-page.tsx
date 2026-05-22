@@ -102,7 +102,7 @@ export function EventRegistrationPage({ data }: Props) {
         );
       } else if (result.outcome === "pending") {
         router.push(
-          `/ticket/${encodeURIComponent(result.confirmationCode)}?pay=1`
+          `/registration/${encodeURIComponent(result.confirmationCode)}?pay=1`
         );
         return;
       } else {

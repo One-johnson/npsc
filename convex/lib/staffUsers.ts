@@ -12,7 +12,7 @@ export async function insertStaffUser(
     name: string;
     contact?: string;
     password: string;
-    role: "admin" | "finance" | "checkin";
+    role: "admin" | "finance";
   }
 ) {
   if (args.password.length < 8) {

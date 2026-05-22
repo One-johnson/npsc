@@ -1,4 +1,4 @@
-import { CheckCircle2, QrCode } from "lucide-react";
+import { Award, CheckCircle2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -15,11 +15,11 @@ export function ConfirmationPreview() {
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div>
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-              Register once. Check in with a tap.
+              Register once. Track everything online.
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Complete your delegate registration online, pay securely through
-              Hubtel, and receive your QR ticket instantly.
+              Complete your delegate registration, pay securely through Hubtel,
+              and receive your certificate of attendance from GIPS after the event.
             </p>
           </div>
           <Card className="mx-auto w-full max-w-sm shadow-lg ring-2 ring-primary/15">
@@ -32,11 +32,14 @@ export function ConfirmationPreview() {
               <CardDescription>{mockEvent.titleLine2}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="mx-auto flex aspect-square max-w-[180px] items-center justify-center rounded-xl border-2 border-dashed border-primary/30 bg-muted/50">
-                <QrCode className="size-24 text-primary/40" />
+              <div className="mx-auto flex aspect-[4/3] max-w-[220px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-primary/30 bg-muted/50 px-4 py-6">
+                <Award className="size-16 text-primary/50" />
+                <p className="mt-3 text-center text-xs font-medium text-primary">
+                  Certificate of attendance
+                </p>
               </div>
               <p className="text-center text-xs text-muted-foreground">
-                {mockEvent.edition} � {mockEvent.dateShort} � UPSA Auditorium
+                {mockEvent.edition} · {mockEvent.dateShort} · UPSA Auditorium
               </p>
             </CardContent>
           </Card>

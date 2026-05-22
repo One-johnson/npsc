@@ -46,14 +46,19 @@ export function ParticipantTicketStats({ eventId, highlightTicketTypeId }: Props
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <SummaryCard label="Event capacity" value={stats.event.capacity} />
         <SummaryCard
           label="Registered (event)"
           value={stats.event.registeredCount}
         />
         <SummaryCard label="Active registrations" value={stats.totals.active} />
+        <SummaryCard label="Confirmed" value={stats.totals.confirmed} />
         <SummaryCard label="On waitlist" value={stats.totals.waitlisted} />
+        <SummaryCard
+          label="Certificates issued"
+          value={stats.totals.certificatesIssued}
+        />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">

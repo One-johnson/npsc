@@ -3,12 +3,13 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  RegistrationModal,
+  RegistrationModalBackButton,
+  RegistrationModalBody,
+  RegistrationModalDescription,
+  RegistrationModalHeader,
+  RegistrationModalTitle,
+} from "@/components/registration/registration-modal";
 import { formatPrice } from "@/lib/format-price";
 import type { PublicEventBundle, TicketTypeOption } from "@/lib/event/types";
 import { cn } from "@/lib/utils";
@@ -39,17 +40,25 @@ export function TicketTypeDialog({
   const eventFull = event.registeredCount >= event.capacity;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="gap-4 p-6 sm:max-w-2xl sm:p-8">
-        <DialogHeader className="text-left">
-          <DialogTitle className="text-xl sm:text-2xl">
-            Choose your registration type
-          </DialogTitle>
-          <DialogDescription>
-            {event.titleLine2} · {event.dateShort}
-          </DialogDescription>
-        </DialogHeader>
+    <RegistrationModal
+      open={open}
+      onOpenChange={onOpenChange}
+      className="gap-4 p-6 sm:max-w-2xl sm:p-8"
+    >
+      <RegistrationModalBackButton
+        label="Close"
+        onBack={() => onOpenChange(false)}
+      />
+      <RegistrationModalHeader className="text-left">
+        <RegistrationModalTitle className="text-xl sm:text-2xl">
+          Choose your registration type
+        </RegistrationModalTitle>
+        <RegistrationModalDescription>
+          {event.titleLine2} · {event.dateShort}
+        </RegistrationModalDescription>
+      </RegistrationModalHeader>
 
+      <RegistrationModalBody className="grid gap-4">
         {!bundle.isLive ? (
           <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-900 dark:text-amber-200">
             Preview mode — run database setup at{" "}
@@ -116,7 +125,7 @@ export function TicketTypeDialog({
         >
           Cancel
         </Button>
-      </DialogContent>
-    </Dialog>
+      </RegistrationModalBody>
+    </RegistrationModal>
   );
 }

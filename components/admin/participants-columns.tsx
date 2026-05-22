@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { Id } from "@/convex/_generated/dataModel";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +12,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
-import { ExternalLink, MoreHorizontal, TrendingUp } from "lucide-react";
+import { CertificatePdfDownload } from "@/components/certificate/certificate-pdf-download";
+import { buildCertificatePdfData } from "@/lib/certificate/build-pdf-data";
+import type { CertificateEventContext } from "@/lib/certificate/build-pdf-data";
+import {
+  Award,
+  Eye,
+  MoreHorizontal,
+  TrendingUp,
+  XCircle,
+} from "lucide-react";
 
 export type ParticipantRow = {
   _id: Id<"registrations">;
@@ -28,6 +36,8 @@ export type ParticipantRow = {
   confirmationCode: string;
   createdAt: number;
   eventSlug: string;
+  certificateNumber: string | null;
+  certificateIssuedAt: number | null;
 };
 
 const KIND_LABELS: Record<string, string> = {
@@ -41,8 +51,15 @@ const KIND_LABELS: Record<string, string> = {
 
 type ColumnOptions = {
   canPromote: boolean;
+  canManageCertificates: boolean;
+  canDownloadCertificate: boolean;
+  certificateEvent: CertificateEventContext | null;
   onPromote?: (id: Id<"registrations">) => void;
+  onIssueCertificate?: (id: Id<"registrations">) => void;
+  onRevokeCertificate?: (id: Id<"registrations">) => void;
+  onViewRegistration?: (row: ParticipantRow) => void;
   promotingId?: Id<"registrations"> | null;
+  certActionId?: Id<"registrations"> | null;
 };
 
 export function getParticipantsColumns(
@@ -67,7 +84,8 @@ export function getParticipantsColumns(
           r.phone.toLowerCase().includes(q) ||
           r.confirmationCode.toLowerCase().includes(q) ||
           (r.organization?.toLowerCase().includes(q) ?? false) ||
-          (r.position?.toLowerCase().includes(q) ?? false)
+          (r.position?.toLowerCase().includes(q) ?? false) ||
+          (r.certificateNumber?.toLowerCase().includes(q) ?? false)
         );
       },
     },
@@ -134,10 +152,28 @@ export function getParticipantsColumns(
       },
     },
     {
-      accessorKey: "confirmationCode",
-      meta: { label: "Confirmation" },
+      id: "certificate",
+      meta: { label: "Certificate" },
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Confirmation" />
+        <DataTableColumnHeader column={column} title="Certificate" />
+      ),
+      cell: ({ row }) => {
+        const num = row.original.certificateNumber;
+        if (!num) {
+          return <span className="text-xs text-muted-foreground">—</span>;
+        }
+        return (
+          <span className="font-mono text-xs" title="Certificate number">
+            {num}
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: "confirmationCode",
+      meta: { label: "Reference" },
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Reference" />
       ),
       cell: ({ row }) => (
         <span className="font-mono text-xs">
@@ -169,6 +205,8 @@ export function getParticipantsColumns(
       cell: ({ row }) => {
         const p = row.original;
         const isPromoting = options.promotingId === p._id;
+        const certBusy = options.certActionId === p._id;
+        const hasCert = Boolean(p.certificateNumber);
 
         return (
           <DropdownMenu>
@@ -182,17 +220,55 @@ export function getParticipantsColumns(
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
-                render={
-                  <Link
-                    href={`/ticket/${encodeURIComponent(p.confirmationCode)}`}
-                    target="_blank"
-                    className="flex w-full items-center gap-1.5"
-                  />
-                }
+                onClick={() => options.onViewRegistration?.(p)}
               >
-                <ExternalLink className="size-4" />
-                View ticket
+                <Eye className="size-4" />
+                View registration
               </DropdownMenuItem>
+              {options.canManageCertificates &&
+              p.status === "confirmed" &&
+              !hasCert ? (
+                <DropdownMenuItem
+                  disabled={certBusy}
+                  onClick={() => options.onIssueCertificate?.(p._id)}
+                >
+                  <Award className="size-4" />
+                  {certBusy ? "Issuing…" : "Issue certificate"}
+                </DropdownMenuItem>
+              ) : null}
+              {options.canDownloadCertificate &&
+              hasCert &&
+              p.certificateNumber &&
+              p.certificateIssuedAt &&
+              options.certificateEvent ? (
+                <DropdownMenuItem
+                  render={
+                    <CertificatePdfDownload
+                      variant="menu"
+                      data={buildCertificatePdfData(
+                        {
+                          fullName: p.fullName,
+                          organization: p.organization,
+                          position: p.position,
+                          ticketTypeName: p.ticketTypeName,
+                          certificateNumber: p.certificateNumber,
+                          certificateIssuedAt: p.certificateIssuedAt,
+                        },
+                        options.certificateEvent
+                      )}
+                    />
+                  }
+                />
+              ) : null}
+              {options.canManageCertificates && hasCert ? (
+                <DropdownMenuItem
+                  disabled={certBusy}
+                  onClick={() => options.onRevokeCertificate?.(p._id)}
+                >
+                  <XCircle className="size-4" />
+                  {certBusy ? "Revoking…" : "Revoke certificate"}
+                </DropdownMenuItem>
+              ) : null}
               {p.status === "waitlisted" && options.canPromote ? (
                 <>
                   <DropdownMenuSeparator />

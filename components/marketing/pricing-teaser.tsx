@@ -6,14 +6,14 @@ import { formatPrice, mockEvent } from "@/lib/mock-event";
 
 const included = [
   "Full 2-day conference access",
-  "Digital ticket with QR check-in",
+  "Secure online registration & payment",
   "Networking sessions & exhibition",
-  "Certificate of attendance",
+  "Certificate of attendance (issued after the event by GIPS)",
 ];
 
 export function PricingTeaser() {
   return (
-    <section id="tickets" className="border-y border-border/60 bg-muted/20 py-16 md:py-24">
+    <section id="register" className="border-y border-border/60 bg-muted/20 py-16 md:py-24">
       <div className="container mx-auto max-w-6xl px-4 md:px-6">
         <SectionHeading
           eyebrow="Registration"

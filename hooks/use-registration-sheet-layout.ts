@@ -1,7 +1,8 @@
 import * as React from "react";
 
-const MOBILE_BREAKPOINT = 768;
-const QUERY = `(max-width: ${MOBILE_BREAKPOINT - 1}px)`;
+/** Sheet for registration on phones and tablets; dialog on large desktops. */
+export const REGISTRATION_SHEET_BREAKPOINT = 1024;
+const QUERY = `(max-width: ${REGISTRATION_SHEET_BREAKPOINT - 1}px)`;
 
 function getSnapshot() {
   return window.matchMedia(QUERY).matches;
@@ -17,6 +18,6 @@ function subscribe(callback: () => void) {
   return () => mql.removeEventListener("change", callback);
 }
 
-export function useIsMobile() {
+export function useRegistrationSheetLayout() {
   return React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

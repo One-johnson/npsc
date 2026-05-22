@@ -44,9 +44,9 @@ const NPSC_SEED = {
     ],
     features: [
       { icon: "users", title: "Ghana's flagship procurement forum", description: "Connect with peers from government, academia, and industry under one roof." },
-      { icon: "zap", title: "Fast digital registration", description: "Register in minutes and receive your ticket instantly by email." },
+      { icon: "zap", title: "Fast digital registration", description: "Register in minutes online and track your status with a reference code." },
       { icon: "credit-card", title: "Secure Hubtel payments", description: "Pay with Mobile Money, card, or bank transfer — safe and convenient." },
-      { icon: "qr-code", title: "QR check-in", description: "Contactless entry at UPSA Auditorium with your unique digital ticket." },
+      { icon: "award", title: "Certificate of attendance", description: "Receive your NPSC certificate digitally once issued by the organisers." },
       { icon: "shield", title: "Trusted conveners", description: "Organised by GIPS and partners committed to procurement excellence in Ghana." },
     ],
     audiences: [
@@ -58,14 +58,14 @@ const NPSC_SEED = {
     steps: [
       { step: 1, title: "Register your details", description: "Fill in your name, email, and phone to reserve your seat." },
       { step: 2, title: "Pay securely via Hubtel", description: "Complete payment with MoMo, card, or bank transfer." },
-      { step: 3, title: "Receive your digital ticket", description: "Get email confirmation with your QR code for both conference days." },
-      { step: 4, title: "Check in at UPSA", description: "Present your QR at the auditorium — quick and contactless." },
+      { step: 3, title: "Save your reference code", description: "Use your registration reference to check status and complete payment if needed." },
+      { step: 4, title: "Receive your certificate", description: "After the conference, GIPS issues certificates through official channels." },
     ],
     faqs: [
       { question: "Who should attend NPSC 2026?", answer: "Procurement and supply chain professionals in the public and private sectors, vendors, academics, students, and anyone interested in improving procurement outcomes in Ghana." },
       { question: "Where is the conference held?", answer: "UPSA Auditorium, University of Professional Studies, Accra, Ghana — 2–3 September 2026." },
       { question: "What payment methods are accepted?", answer: "Mobile Money (MTN, Telecel, AirtelTigo), debit/credit cards, and bank transfer through Hubtel." },
-      { question: "Will I receive a certificate?", answer: "Standard and corporate delegates receive a certificate of attendance after completing both days." },
+      { question: "Will I receive a certificate?", answer: "Confirmed delegates receive a certificate of attendance after the conference, issued and distributed by GIPS — not via self-service download." },
       { question: "Can I register on behalf of my organisation?", answer: "Yes. Use the corporate package for teams, or register multiple standard passes with individual attendee details." },
     ],
     partners: [

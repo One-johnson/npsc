@@ -218,6 +218,26 @@ export const bulkDeleteStaff = mutation({
 });
 
 /** Assigns npsc#### IDs to any staff created before staff IDs were introduced. */
+/** One-time: migrate legacy `checkin` staff roles to `finance`. */
+export const backfillLegacyCheckinRoles = mutation({
+  args: { sessionToken: v.string() },
+  handler: async (ctx, args) => {
+    await requireRole(ctx, args.sessionToken, ["admin"]);
+    const users = await ctx.db.query("users").collect();
+    let updated = 0;
+    for (const user of users) {
+      if ((user.role as string) === "checkin") {
+        await ctx.db.patch(user._id, {
+          role: "finance",
+          updatedAt: Date.now(),
+        });
+        updated += 1;
+      }
+    }
+    return { updated };
+  },
+});
+
 export const backfillStaffIds = mutation({
   args: { sessionToken: v.string() },
   handler: async (ctx, args) => {

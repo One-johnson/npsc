@@ -8,7 +8,7 @@ export function StepsTimeline() {
         <SectionHeading
           eyebrow="How it works"
           title="Register in four simple steps"
-          description="From ticket selection to check-in at UPSA Auditorium."
+          description="Choose your pass type, register, pay, and download your certificate when issued."
         />
         <ol className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {mockEvent.steps.map((step) => (

@@ -17,7 +17,7 @@ type Props = {
   autoOpen?: boolean;
 };
 
-export function TicketPendingPayment({
+export function RegistrationPendingPayment({
   bundle,
   registration,
   autoOpen = false,

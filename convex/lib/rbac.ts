@@ -78,12 +78,8 @@ export function canViewFinance(role: UserRole): boolean {
   return role === "admin" || role === "finance";
 }
 
-export function canCheckIn(role: UserRole): boolean {
-  return role === "admin" || role === "checkin";
-}
-
 export function canViewRegistrations(role: UserRole): boolean {
-  return role === "admin" || role === "finance" || role === "checkin";
+  return role === "admin" || role === "finance";
 }
 
 export function canViewPayments(role: UserRole): boolean {

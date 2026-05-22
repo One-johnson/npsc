@@ -19,8 +19,8 @@ export function DashboardStats() {
   const cards = [
     { label: "Events", value: stats.eventCount },
     { label: "Published", value: stats.publishedEventCount },
-    { label: "Ticket types", value: stats.ticketTypeCount },
-    { label: "Tickets sold", value: stats.totalSold },
+    { label: "Pass types", value: stats.ticketTypeCount },
+    { label: "Passes sold", value: stats.totalSold },
     { label: "Total capacity", value: stats.totalCapacity },
     { label: "Staff accounts", value: stats.staffCount },
   ];

@@ -5,12 +5,23 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   CalendarDays,
+  ChevronsUpDown,
+  CreditCard,
+  ExternalLink,
   LayoutDashboard,
   LogOut,
-  CreditCard,
   UserCheck,
   Users,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -34,7 +45,7 @@ const nav = [
     href: "/admin/participants",
     label: "Participants",
     icon: UserCheck,
-    roles: ["admin", "finance", "checkin"] as const,
+    roles: ["admin", "finance"] as const,
   },
   {
     href: "/admin/payments",
@@ -67,6 +78,13 @@ export function AdminAppSidebar({ user }: { user: StaffUser }) {
       !item.roles ||
       (item.roles as readonly StaffUser["role"][]).includes(user.role)
   );
+
+  const initials = user.name
+    .split(/\s+/)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
     <Sidebar collapsible="icon">
@@ -123,26 +141,74 @@ export function AdminAppSidebar({ user }: { user: StaffUser }) {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="px-2 py-1.5 group-data-[collapsible=icon]:hidden">
-              <p className="truncate text-sm font-medium">{user.name}</p>
-              {user.staffId ? (
-                <p className="truncate font-mono text-xs text-muted-foreground">
-                  {user.staffId}
-                </p>
-              ) : null}
-              <p className="truncate text-xs text-muted-foreground">
-                {user.email}
-              </p>
-              <p className="mt-0.5 text-xs capitalize text-primary">
-                {user.role}
-              </p>
-            </div>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton onClick={() => void handleLogout()}>
-              <LogOut />
-              <span>Sign out</span>
-            </SidebarMenuButton>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <SidebarMenuButton
+                    size="lg"
+                    tooltip={user.name}
+                    className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+                  />
+                }
+              >
+                <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-xs font-semibold text-sidebar-primary-foreground">
+                  {initials}
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">{user.name}</span>
+                  <span className="truncate text-xs capitalize text-muted-foreground">
+                    {user.role}
+                  </span>
+                </div>
+                <ChevronsUpDown className="ml-auto size-4 shrink-0 opacity-60" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-56"
+                side="top"
+                align="start"
+                sideOffset={4}
+              >
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm font-medium leading-none">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {user.email}
+                      </p>
+                      {user.staffId ? (
+                        <p className="font-mono text-xs text-muted-foreground">
+                          {user.staffId}
+                        </p>
+                      ) : null}
+                      <p className="text-xs capitalize text-primary">
+                        {user.role}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  render={
+                    <Link
+                      href="/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex w-full items-center gap-2"
+                    />
+                  }
+                >
+                  <ExternalLink className="size-4" />
+                  View public site
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => void handleLogout()}>
+                  <LogOut className="size-4" />
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

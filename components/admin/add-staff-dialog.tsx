@@ -34,11 +34,6 @@ const ASSIGNABLE_ROLES: {
     label: "Finance",
     description: "Payments, refunds, and financial reports.",
   },
-  {
-    value: "checkin",
-    label: "Check-in",
-    description: "On-site QR scanning and attendee lookup.",
-  },
 ];
 
 type CreatedStaff = {
@@ -63,7 +58,7 @@ export function AddStaffDialog({
   const [email, setEmail] = useState("");
   const [contact, setContact] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<StaffRole>("checkin");
+  const [role, setRole] = useState<StaffRole>("finance");
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<CreatedStaff | null>(null);
   const [loading, setLoading] = useState(false);
@@ -73,7 +68,7 @@ export function AddStaffDialog({
     setEmail("");
     setContact("");
     setPassword("");
-    setRole("checkin");
+    setRole("finance");
     setError(null);
     setCreated(null);
   }
@@ -109,7 +104,7 @@ export function AddStaffDialog({
       setEmail("");
       setContact("");
       setPassword("");
-      setRole("checkin");
+      setRole("finance");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create user");
     } finally {
@@ -123,43 +118,40 @@ export function AddStaffDialog({
         <DialogHeader>
           <DialogTitle>Add staff member</DialogTitle>
           <DialogDescription>
-            Create a finance or check-in account. They receive a unique staff ID (
+            Create a finance account. They receive a unique staff ID (
             <span className="font-mono">npsc####</span>) for sign-in.
           </DialogDescription>
         </DialogHeader>
         {created ? (
-          <div
-            className="rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm"
-            role="status"
-          >
+          <div className="space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm">
             <p className="font-medium text-primary">Staff account created</p>
-            <ul className="mt-2 space-y-1 font-mono text-xs">
-              <li>
-                <span className="text-muted-foreground">Staff ID: </span>
-                {created.staffId}
-              </li>
-              <li>
-                <span className="text-muted-foreground">Email: </span>
-                {created.email}
-              </li>
-              {created.contact ? (
-                <li>
-                  <span className="text-muted-foreground">Contact: </span>
-                  {created.contact}
-                </li>
-              ) : null}
-              <li>
-                <span className="text-muted-foreground">Role: </span>
-                {created.role}
-              </li>
-            </ul>
-            <p className="mt-2 text-xs text-muted-foreground">
-              They can sign in at /login using the staff ID or email.
+            <p>
+              <span className="text-muted-foreground">Staff ID: </span>
+              <span className="font-mono font-semibold">{created.staffId}</span>
             </p>
+            <p>
+              <span className="text-muted-foreground">Name: </span>
+              {created.name}
+            </p>
+            <p>
+              <span className="text-muted-foreground">Email: </span>
+              {created.email}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Share the staff ID and password securely. They sign in at /login.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={() => handleOpenChange(false)}
+            >
+              Done
+            </Button>
           </div>
         ) : (
           <form onSubmit={(e) => void handleCreate(e)} className="space-y-4">
-            <div className="space-y-2">
+            <div className="grid gap-2">
               <Label htmlFor="staff-name">Full name</Label>
               <Input
                 id="staff-name"
@@ -168,8 +160,8 @@ export function AddStaffDialog({
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="staff-email">Work email</Label>
+            <div className="grid gap-2">
+              <Label htmlFor="staff-email">Email</Label>
               <Input
                 id="staff-email"
                 type="email"
@@ -178,18 +170,16 @@ export function AddStaffDialog({
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="staff-contact">Contact</Label>
+            <div className="grid gap-2">
+              <Label htmlFor="staff-contact">Contact (optional)</Label>
               <Input
                 id="staff-contact"
-                type="tel"
-                placeholder="Phone number"
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="staff-password">Temporary password</Label>
+            <div className="grid gap-2">
+              <Label htmlFor="staff-password">Password</Label>
               <Input
                 id="staff-password"
                 type="password"
@@ -198,11 +188,8 @@ export function AddStaffDialog({
                 minLength={8}
                 required
               />
-              <p className="text-xs text-muted-foreground">
-                Share securely; they can change it after sign-in.
-              </p>
             </div>
-            <div className="space-y-2">
+            <div className="grid gap-2">
               <Label>Role</Label>
               <Select
                 value={role}
@@ -224,34 +211,17 @@ export function AddStaffDialog({
               </p>
             </div>
             {error ? (
-              <p className="text-sm text-destructive">{error}</p>
+              <p className="text-sm text-destructive" role="alert">
+                {error}
+              </p>
             ) : null}
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => handleOpenChange(false)}
-              >
-                Cancel
-              </Button>
               <Button type="submit" disabled={loading}>
-                {loading ? "Creating…" : "Create account"}
+                {loading ? "Creating…" : "Create staff"}
               </Button>
             </DialogFooter>
           </form>
         )}
-        {created ? (
-          <DialogFooter>
-            <Button
-              onClick={() => {
-                resetForm();
-                handleOpenChange(false);
-              }}
-            >
-              Done
-            </Button>
-          </DialogFooter>
-        ) : null}
       </DialogContent>
     </Dialog>
   );

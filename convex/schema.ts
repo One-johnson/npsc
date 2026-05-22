@@ -3,8 +3,7 @@ import { v } from "convex/values";
 
 export const userRoleValidator = v.union(
   v.literal("admin"),
-  v.literal("finance"),
-  v.literal("checkin")
+  v.literal("finance")
 );
 
 export const ticketTypeKindValidator = v.union(
@@ -200,4 +199,15 @@ export default defineSchema({
     .index("by_registration", ["registrationId"])
     .index("by_event", ["eventId"])
     .index("by_event_paid_at", ["eventId", "paidAt"]),
+
+  certificates: defineTable({
+    registrationId: v.id("registrations"),
+    eventId: v.id("events"),
+    certificateNumber: v.string(),
+    issuedAt: v.number(),
+    issuedByUserId: v.id("users"),
+    revokedAt: v.optional(v.number()),
+  })
+    .index("by_registration", ["registrationId"])
+    .index("by_event", ["eventId"]),
 });

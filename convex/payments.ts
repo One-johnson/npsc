@@ -7,10 +7,6 @@ import {
   paymentProviderValidator,
 } from "./schema";
 import { canViewPayments, requireAuth } from "./lib/rbac";
-import {
-  getTicketQrSigningSecret,
-  signTicketQrPayload,
-} from "./lib/ticketQr";
 
 async function confirmRegistrationAndRecordPayment(
   ctx: GenericMutationCtx<DataModel>,
@@ -42,17 +38,11 @@ async function confirmRegistrationAndRecordPayment(
         q.eq("registrationId", registration._id)
       )
       .first();
-    const qrPayload = await signTicketQrPayload(
-      registration._id,
-      registration.confirmationCode,
-      getTicketQrSigningSecret()
-    );
     return {
       ok: true as const,
       alreadyConfirmed: true as const,
       confirmationCode: registration.confirmationCode,
       paymentId: existingPayment?._id ?? null,
-      qrPayload,
     };
   }
 
@@ -81,11 +71,6 @@ async function confirmRegistrationAndRecordPayment(
 
   const event = await ctx.db.get(registration.eventId);
   const ticketType = await ctx.db.get(registration.ticketTypeId);
-  const qrPayload = await signTicketQrPayload(
-    registration._id,
-    registration.confirmationCode,
-    getTicketQrSigningSecret()
-  );
 
   return {
     ok: true as const,
@@ -94,7 +79,6 @@ async function confirmRegistrationAndRecordPayment(
     paymentId,
     eventTitle: event?.titleLine2 ?? "",
     ticketTypeName: ticketType?.name ?? registration.ticketKind,
-    qrPayload,
   };
 }
 

@@ -143,7 +143,6 @@ export function StaffTable() {
               <SelectItem value="all">All roles</SelectItem>
               <SelectItem value="admin">Admin</SelectItem>
               <SelectItem value="finance">Finance</SelectItem>
-              <SelectItem value="checkin">Check-in</SelectItem>
             </SelectContent>
           </Select>
           <Select
