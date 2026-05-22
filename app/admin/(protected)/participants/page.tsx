@@ -11,7 +11,8 @@ export default function AdminParticipantsPage() {
         <h1 className="text-2xl font-bold tracking-tight">Participants</h1>
         <p className="mt-1 text-muted-foreground">
           View and manage registrations by conference edition and pass type.
-          Promote waitlisted attendees when capacity opens.
+          Promote waitlisted attendees when capacity opens. Issue certificates
+          for confirmed participants.
         </p>
       </div>
       <ParticipantsPanel />

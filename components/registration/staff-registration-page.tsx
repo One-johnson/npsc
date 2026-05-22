@@ -16,7 +16,7 @@ export function StaffRegistrationPage() {
         <CardHeader className="text-center">
           <CardTitle>Staff accounts are by invitation</CardTitle>
           <CardDescription>
-            Finance and check-in staff are registered by a platform administrator.
+            Finance staff are registered by a platform administrator.
             You will receive a staff ID (<span className="font-mono">npsc####</span>
             ), email, and password to sign in.
           </CardDescription>

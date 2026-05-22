@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -8,13 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  RegistrationModal,
+  RegistrationModalBackButton,
+  RegistrationModalBody,
+  RegistrationModalDescription,
+  RegistrationModalFooter,
+  RegistrationModalHeader,
+  RegistrationModalTitle,
+} from "@/components/registration/registration-modal";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/format-price";
 import type { PublicEventBundle, TicketTypeOption } from "@/lib/event/types";
@@ -30,7 +31,10 @@ type Props = {
   isWaitlistIntent?: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onBack?: () => void;
   onSuccess: (data: AttendeeRegistrationData) => void | Promise<void>;
+  /** Restore fields when returning from payment. */
+  initialData?: Partial<AttendeeRegistrationData>;
 };
 
 export function RegistrationDialog({
@@ -39,7 +43,9 @@ export function RegistrationDialog({
   isWaitlistIntent = false,
   open,
   onOpenChange,
+  onBack,
   onSuccess,
+  initialData,
 }: Props) {
   const { event } = bundle;
 
@@ -59,6 +65,21 @@ export function RegistrationDialog({
     form.setValue("ticketTypeId", ticket.id);
   }, [ticket.id, form]);
 
+  const wasOpen = useRef(false);
+  useEffect(() => {
+    if (open && !wasOpen.current) {
+      form.reset({
+        ticketTypeId: ticket.id,
+        fullName: initialData?.fullName ?? "",
+        email: initialData?.email ?? "",
+        phone: initialData?.phone ?? "",
+        organization: initialData?.organization ?? "",
+        position: initialData?.position ?? "",
+      });
+    }
+    wasOpen.current = open;
+  }, [open, ticket.id, initialData, form]);
+
   async function onSubmit(data: AttendeeRegistrationData) {
     try {
       await onSuccess({ ...data, ticketTypeId: ticket.id });
@@ -76,32 +97,40 @@ export function RegistrationDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="gap-6 p-6 sm:max-w-2xl sm:p-8">
-        <DialogHeader className="gap-2 text-left">
-          <DialogTitle className="text-xl sm:text-2xl">
-            Register as {ticket.name}
-          </DialogTitle>
-          <DialogDescription>
-            {event.titleLine2} · {event.dateShort}
-          </DialogDescription>
-          {isWaitlistIntent ? (
-            <p className="rounded-lg border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-xs text-amber-950 dark:text-amber-100">
-              This pass or the conference is at capacity. Submitting adds you to
-              the waitlist at no charge. We will contact you if a seat opens.
-            </p>
-          ) : null}
-          <div className="flex flex-wrap items-center gap-2 pt-1">
-            <Badge variant="secondary">{ticket.name}</Badge>
-            <span className="text-sm font-semibold text-primary">
-              {ticket.price > 0
-                ? formatPrice(ticket.price, ticket.currency)
-                : "Complimentary"}
-            </span>
-          </div>
-        </DialogHeader>
+    <RegistrationModal
+      open={open}
+      onOpenChange={onOpenChange}
+      className="gap-6 p-6 sm:max-w-2xl sm:p-8"
+    >
+      {onBack ? (
+        <RegistrationModalBackButton onBack={onBack} />
+      ) : null}
+      <RegistrationModalHeader className="gap-2 text-left">
+        <RegistrationModalTitle className="text-xl sm:text-2xl">
+          Register as {ticket.name}
+        </RegistrationModalTitle>
+        <RegistrationModalDescription>
+          {event.titleLine2} · {event.dateShort}
+        </RegistrationModalDescription>
+        {isWaitlistIntent ? (
+          <p className="rounded-lg border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-xs text-amber-950 dark:text-amber-100">
+            This pass or the conference is at capacity. Submitting adds you to
+            the waitlist at no charge. We will contact you if a seat opens.
+          </p>
+        ) : null}
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <Badge variant="secondary">{ticket.name}</Badge>
+          <span className="text-sm font-semibold text-primary">
+            {ticket.price > 0
+              ? formatPrice(ticket.price, ticket.currency)
+              : "Complimentary"}
+          </span>
+        </div>
+      </RegistrationModalHeader>
+
+      <RegistrationModalBody>
         <form
-          className="grid gap-5 sm:grid-cols-2 sm:gap-6"
+          className="flex flex-1 flex-col gap-5 sm:grid sm:grid-cols-2 sm:gap-6"
           onSubmit={form.handleSubmit(onSubmit)}
         >
           <input type="hidden" {...form.register("ticketTypeId")} />
@@ -136,7 +165,7 @@ export function RegistrationDialog({
             error={form.formState.errors.position?.message}
             inputProps={form.register("position")}
           />
-          <DialogFooter className="px-0 pb-0 sm:col-span-2 sm:justify-end">
+          <RegistrationModalFooter className="px-0 pb-0 sm:col-span-2 sm:justify-end">
             <Button
               type="button"
               variant="outline"
@@ -153,10 +182,10 @@ export function RegistrationDialog({
                   ? "Submitting…"
                   : "Continue to payment"}
             </Button>
-          </DialogFooter>
+          </RegistrationModalFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </RegistrationModalBody>
+    </RegistrationModal>
   );
 }
 

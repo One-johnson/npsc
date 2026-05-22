@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 const navLinks = [
   { href: "#about", label: "About" },
   { href: "#schedule", label: "Programme" },
-  { href: "#tickets", label: "Tickets" },
+  { href: "#register", label: "Register" },
   { href: "#faq", label: "FAQ" },
 ];
 
@@ -62,7 +62,7 @@ export function SiteHeader() {
           >
             {mockEvent.website}
           </a>
-          <RegisterButton size="sm">Register</RegisterButton>
+          <RegisterButton size="sm" />
         </div>
 
         <Button
@@ -94,7 +94,7 @@ export function SiteHeader() {
             </a>
           ))}
           <div className="mt-2" onClick={() => setOpen(false)}>
-            <RegisterButton className="w-full">Register</RegisterButton>
+            <RegisterButton className="w-full" />
           </div>
         </nav>
       </div>

@@ -1,6 +1,6 @@
 import {
+  Award,
   CreditCard,
-  QrCode,
   Shield,
   Users,
   Zap,
@@ -15,7 +15,7 @@ const iconMap: Record<EventFeature["icon"], LucideIcon> = {
   zap: Zap,
   shield: Shield,
   users: Users,
-  "qr-code": QrCode,
+  award: Award,
   "credit-card": CreditCard,
 };
 
@@ -26,7 +26,7 @@ export function FeatureGrid() {
         <SectionHeading
           eyebrow="Why choose us"
           title="Everything you need for a smooth event day"
-          description="From registration to check-in, we've removed the friction."
+          description="From registration to certificate issuance, everything runs in one place."
         />
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {mockEvent.features.map((feature) => {

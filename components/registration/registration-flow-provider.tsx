@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { mockEvent } from "@/lib/mock-event";
+import { allActiveTicketTypesSoldOut } from "@/lib/event/capacity";
 import { useConferenceEvent } from "@/hooks/use-conference-event";
 import type { PublicEventBundle, TicketTypeOption } from "@/lib/event/types";
 import type {
@@ -38,6 +39,8 @@ type RegistrationFlowContextValue = {
   openRegistration: (ticketKind?: string) => void;
   bundle: PublicEventBundle;
   isLoading: boolean;
+  /** All active pass types are sold out — CTA should offer waitlist. */
+  allTicketTypesSoldOut: boolean;
 };
 
 const RegistrationFlowContext =
@@ -87,6 +90,21 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
     setFormDialogOpen(true);
   }, []);
 
+  const handleFormBack = useCallback(() => {
+    setFormDialogOpen(false);
+    setTicketDialogOpen(true);
+  }, []);
+
+  const handlePaymentBack = useCallback(() => {
+    if (!pending) return;
+    const ticket = bundle.ticketTypes.find(
+      (t) => t.id === pending.ticketTypeId
+    );
+    if (ticket) setSelectedTicket(ticket);
+    setPaymentDialogOpen(false);
+    setFormDialogOpen(true);
+  }, [bundle.ticketTypes, pending]);
+
   const handleFormSuccess = useCallback(
     async (data: AttendeeRegistrationData) => {
       if (!selectedTicket) return;
@@ -118,7 +136,7 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
           await delay(1800);
           setOverlay(null);
           router.push(
-            `/ticket/${encodeURIComponent(result.confirmationCode)}`
+            `/registration/${encodeURIComponent(result.confirmationCode)}`
           );
         } catch (e) {
           setOverlay(null);
@@ -150,7 +168,7 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
             await delay(1800);
             setOverlay(null);
             router.push(
-              `/ticket/${encodeURIComponent(result.confirmationCode)}`
+              `/registration/${encodeURIComponent(result.confirmationCode)}`
             );
             return;
           }
@@ -213,12 +231,12 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
           setPending(null);
           setOverlay({
             phase: "payment-success",
-            email: registration.email,
+            confirmationCode: registration.confirmationCode,
           });
           await delay(3200);
           setOverlay(null);
           router.push(
-            `/ticket/${encodeURIComponent(registration.confirmationCode)}`
+            `/registration/${encodeURIComponent(registration.confirmationCode)}`
           );
         } catch (e) {
           setOverlay(null);
@@ -236,13 +254,18 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
       setPending(null);
       setOverlay({
         phase: "payment-success",
-        email: registration.email,
+        confirmationCode: registration.confirmationCode,
       });
       await delay(2800);
       setOverlay(null);
-      router.push("/ticket/demo");
+      router.push("/");
     },
     [bundle?.isLive, confirmPayment, router]
+  );
+
+  const allTicketTypesSoldOut = useMemo(
+    () => allActiveTicketTypesSoldOut(bundle),
+    [bundle]
   );
 
   const value = useMemo(
@@ -250,8 +273,9 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
       openRegistration,
       bundle,
       isLoading,
+      allTicketTypesSoldOut,
     }),
-    [openRegistration, bundle, isLoading]
+    [openRegistration, bundle, isLoading, allTicketTypesSoldOut]
   );
 
   return (
@@ -278,6 +302,19 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
             setFormDialogOpen(open);
             if (!open) setSelectedTicket(null);
           }}
+          onBack={handleFormBack}
+          initialData={
+            pending
+              ? {
+                  fullName: pending.fullName,
+                  email: pending.email,
+                  phone: pending.phone,
+                  organization: pending.organization,
+                  position: pending.position,
+                  ticketTypeId: pending.ticketTypeId,
+                }
+              : undefined
+          }
           onSuccess={(data) => void handleFormSuccess(data)}
         />
       ) : null}
@@ -291,6 +328,7 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
             setPaymentDialogOpen(open);
             if (!open) setPending(null);
           }}
+          onBack={handlePaymentBack}
           onComplete={(payment) => handlePaymentComplete(pending, payment)}
         />
       ) : null}

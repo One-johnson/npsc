@@ -5,13 +5,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  RegistrationModal,
+  RegistrationModalBackButton,
+  RegistrationModalBody,
+  RegistrationModalDescription,
+  RegistrationModalFooter,
+  RegistrationModalHeader,
+  RegistrationModalTitle,
+} from "@/components/registration/registration-modal";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/format-price";
 import type { PublicEventBundle } from "@/lib/event/types";
@@ -26,14 +27,16 @@ type Props = {
   registration: PendingRegistration;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onBack?: () => void;
   onComplete: (data: PaymentData) => void | Promise<void>;
 };
 
 export function PaymentDialog({
-  bundle,
+  bundle: _bundle,
   registration,
   open,
   onOpenChange,
+  onBack,
   onComplete,
 }: Props) {
   const [error, setError] = useState<string | null>(null);
@@ -59,16 +62,21 @@ export function PaymentDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="gap-6 p-6 sm:max-w-2xl sm:p-8">
-        <DialogHeader>
-          <DialogTitle>Complete payment</DialogTitle>
-          <DialogDescription>
-            {registration.fullName} · {registration.ticketTypeName} · Hubtel
-            secure checkout
-          </DialogDescription>
-        </DialogHeader>
+    <RegistrationModal
+      open={open}
+      onOpenChange={onOpenChange}
+      className="gap-6 p-6 sm:max-w-2xl sm:p-8"
+    >
+      {onBack ? <RegistrationModalBackButton onBack={onBack} /> : null}
+      <RegistrationModalHeader>
+        <RegistrationModalTitle>Complete payment</RegistrationModalTitle>
+        <RegistrationModalDescription>
+          {registration.fullName} · {registration.ticketTypeName} · Hubtel
+          secure checkout
+        </RegistrationModalDescription>
+      </RegistrationModalHeader>
 
+      <RegistrationModalBody className="grid gap-4">
         <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm">
           <div className="flex justify-between gap-4">
             <span className="text-muted-foreground">
@@ -124,7 +132,7 @@ export function PaymentDialog({
             </p>
           ) : null}
 
-          <DialogFooter className="px-0 pb-0 sm:justify-end">
+          <RegistrationModalFooter className="px-0 pb-0 sm:justify-end">
             <Button
               type="button"
               variant="outline"
@@ -136,9 +144,9 @@ export function PaymentDialog({
             <Button type="submit" disabled={submitting}>
               {submitting ? "Processing…" : "Pay now"}
             </Button>
-          </DialogFooter>
+          </RegistrationModalFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </RegistrationModalBody>
+    </RegistrationModal>
   );
 }

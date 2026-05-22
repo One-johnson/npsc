@@ -8,7 +8,7 @@ export type TicketTier = {
 };
 
 export type EventFeature = {
-  icon: "zap" | "shield" | "users" | "qr-code" | "credit-card";
+  icon: "zap" | "shield" | "users" | "award" | "credit-card";
   title: string;
   description: string;
 };
@@ -121,7 +121,7 @@ export const mockEvent: MockEvent = {
       description: "Best rate for individual professionals. Limited availability.",
       price: 350,
       currency: "GHS",
-      perks: ["Full 2-day access", "Conference materials", "Digital ticket & QR check-in", "Networking sessions"],
+      perks: ["Full 2-day access", "Conference materials", "Certificate of attendance", "Networking sessions"],
     },
     {
       id: "standard",
@@ -149,7 +149,7 @@ export const mockEvent: MockEvent = {
     {
       icon: "zap",
       title: "Fast digital registration",
-      description: "Register in minutes and receive your ticket instantly by email.",
+      description: "Register in minutes online and track your status with a reference code.",
     },
     {
       icon: "credit-card",
@@ -157,9 +157,9 @@ export const mockEvent: MockEvent = {
       description: "Pay with Mobile Money, card, or bank transfer — safe and convenient.",
     },
     {
-      icon: "qr-code",
-      title: "QR check-in",
-      description: "Contactless entry at UPSA Auditorium with your unique digital ticket.",
+      icon: "award",
+      title: "Certificate of attendance",
+      description: "Receive your NPSC certificate digitally once issued by the organisers.",
     },
     {
       icon: "shield",
@@ -202,13 +202,13 @@ export const mockEvent: MockEvent = {
     },
     {
       step: 3,
-      title: "Receive your digital ticket",
-      description: "Get email confirmation with your QR code for both conference days.",
+      title: "Save your reference code",
+      description: "Use your registration reference to check status and complete payment if needed.",
     },
     {
       step: 4,
-      title: "Check in at UPSA",
-      description: "Present your QR at the auditorium — quick and contactless.",
+      title: "Receive your certificate",
+      description: "After the conference, GIPS issues certificates of attendance through official channels.",
     },
   ],
   faqs: [
@@ -230,7 +230,7 @@ export const mockEvent: MockEvent = {
     {
       question: "Will I receive a certificate?",
       answer:
-        "Standard and corporate delegates receive a certificate of attendance after completing both days.",
+        "Confirmed delegates receive a certificate of attendance after the conference, issued and distributed by GIPS through official channels.",
     },
     {
       question: "Can I register on behalf of my organisation?",

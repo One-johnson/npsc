@@ -4,10 +4,6 @@ import { mutation, query } from "./_generated/server";
 import type { DataModel, Id } from "./_generated/dataModel";
 import { canManageEvents, canViewRegistrations, requireAuth } from "./lib/rbac";
 import {
-  getTicketQrSigningSecret,
-  signTicketQrPayload,
-} from "./lib/ticketQr";
-import {
   ticketTypeKindValidator,
   userRoleValidator,
 } from "./schema";
@@ -197,15 +193,27 @@ export const getByConfirmationCode = query({
         registration.createdAt
       );
     }
-    let qrPayload: string | undefined;
-    if (registration.status === "confirmed") {
-      qrPayload = await signTicketQrPayload(
-        registration._id,
-        registration.confirmationCode,
-        getTicketQrSigningSecret()
-      );
-    }
-    return { registration, event, ticketType, waitlistPosition, qrPayload };
+    const certRow = await ctx.db
+      .query("certificates")
+      .withIndex("by_registration", (q) =>
+        q.eq("registrationId", registration._id)
+      )
+      .unique();
+    const certificate =
+      certRow && !certRow.revokedAt
+        ? {
+            certificateNumber: certRow.certificateNumber,
+            issuedAt: certRow.issuedAt,
+          }
+        : null;
+
+    return {
+      registration,
+      event,
+      ticketType,
+      waitlistPosition,
+      certificate,
+    };
   },
 });
 
@@ -290,6 +298,12 @@ export const participantStatsForAdmin = query({
         };
       });
 
+    const certs = await ctx.db
+      .query("certificates")
+      .withIndex("by_event", (q) => q.eq("eventId", args.eventId))
+      .collect();
+    const certificatesIssued = certs.filter((c) => !c.revokedAt).length;
+
     const totals = {
       capacity: ticketTypes.reduce((s, t) => s + t.capacity, 0),
       soldCount: ticketTypes.reduce((s, t) => s + t.soldCount, 0),
@@ -299,6 +313,8 @@ export const participantStatsForAdmin = query({
       active: registrations.filter(
         (r) => r.status === "pending" || r.status === "confirmed"
       ).length,
+      confirmed: registrations.filter((r) => r.status === "confirmed").length,
+      certificatesIssued,
     };
 
     return {
@@ -355,14 +371,27 @@ export const listForAdmin = query({
       .collect();
     const ticketById = new Map(ticketTypes.map((t) => [t._id, t]));
 
+    const certs = await ctx.db
+      .query("certificates")
+      .withIndex("by_event", (q) => q.eq("eventId", args.eventId))
+      .collect();
+    const certByRegistration = new Map(
+      certs
+        .filter((c) => !c.revokedAt)
+        .map((c) => [c.registrationId, c])
+    );
+
     const enriched = rows
       .sort((a, b) => b.createdAt - a.createdAt)
       .map((r) => {
         const ticket = ticketById.get(r.ticketTypeId);
+        const cert = certByRegistration.get(r._id);
         return {
           ...r,
           ticketTypeName: ticket?.name ?? r.ticketKind,
           eventSlug: event.slug,
+          certificateNumber: cert?.certificateNumber ?? null,
+          certificateIssuedAt: cert?.issuedAt ?? null,
         };
       });
 

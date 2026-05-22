@@ -7,31 +7,45 @@ import { useRegistrationFlow } from "@/components/registration/registration-flow
 type Props = ComponentProps<typeof Button> & {
   /** Pre-select ticket kind: participant, vip, speaker, sponsor, exhibitor, media */
   ticketKind?: string;
+  /** Override label (default: Register or Join waitlist). */
+  children?: React.ReactNode;
 };
 
-/** Opens conference registration: choose pass type → form → payment. */
+const DEFAULT_PARTICIPANT_KIND = "participant";
+
+/** Opens conference registration: choose pass type → form → payment (or waitlist). */
 export function RegisterButton({
   ticketKind,
-  children = "Register now",
+  children,
   onClick,
   disabled,
+  variant,
   ...props
 }: Props) {
-  const { openRegistration } = useRegistrationFlow();
+  const { openRegistration, allTicketTypesSoldOut, isLoading } =
+    useRegistrationFlow();
+
+  const isWaitlistCta = allTicketTypesSoldOut;
+  const label = isWaitlistCta
+    ? "Join waitlist"
+    : (children ?? "Register");
 
   return (
     <Button
       type="button"
-      disabled={disabled}
+      disabled={disabled || isLoading}
+      variant={variant ?? (isWaitlistCta ? "outline" : "default")}
       onClick={(e) => {
         onClick?.(e);
         if (!e.defaultPrevented) {
-          openRegistration(ticketKind);
+          openRegistration(
+            ticketKind ?? (isWaitlistCta ? DEFAULT_PARTICIPANT_KIND : undefined)
+          );
         }
       }}
       {...props}
     >
-      {children}
+      {label}
     </Button>
   );
 }

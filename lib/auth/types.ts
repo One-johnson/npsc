@@ -1,4 +1,4 @@
-export type StaffRole = "admin" | "finance" | "checkin";
+export type StaffRole = "admin" | "finance";
 
 export type StaffUser = {
   _id: string;
