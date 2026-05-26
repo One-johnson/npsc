@@ -84,7 +84,7 @@ export const mockEvent: MockEvent = {
   heroImage: "/images/conference-hero.png",
   capacity: 1200,
   registeredCount: 684,
-  registrationFee: 500,
+  registrationFee: 1500,
   registrationCurrency: "GHS",
   about:
     "The National Procurement and Supply Conference (NPSC), convened by the Ghana Institute of Procurement and Supply (GIPS) in collaboration with the Public Procurement Authority, is Ghana's flagship gathering for public and private sector procurement and supply chain excellence. After a successful hiatus, NPSC RETURNS in 2026 with plenaries, workshops, and exhibitions designed to improve efficiency and transparency in procurement.",
@@ -127,7 +127,7 @@ export const mockEvent: MockEvent = {
       id: "standard",
       name: "Standard delegate",
       description: "Full conference access for procurement and supply professionals.",
-      price: 500,
+      price: 1500,
       currency: "GHS",
       perks: ["Full 2-day access", "Lunch on both days", "Exhibition hall access", "Certificate of attendance"],
     },
@@ -153,8 +153,8 @@ export const mockEvent: MockEvent = {
     },
     {
       icon: "credit-card",
-      title: "Secure Hubtel payments",
-      description: "Pay with Mobile Money, card, or bank transfer — safe and convenient.",
+      title: "Mobile Money payment",
+      description: "Pay via MoMo to GIPS after registering — card and bank checkout coming soon.",
     },
     {
       icon: "award",
@@ -197,8 +197,8 @@ export const mockEvent: MockEvent = {
     },
     {
       step: 2,
-      title: "Pay securely via Hubtel",
-      description: "Complete payment with MoMo, card, or bank transfer.",
+      title: "Pay via Mobile Money",
+      description: "Send the pass fee to GIPS using the MoMo number on the registration page.",
     },
     {
       step: 3,
@@ -225,7 +225,7 @@ export const mockEvent: MockEvent = {
     {
       question: "What payment methods are accepted?",
       answer:
-        "Mobile Money (MTN, Telecel, AirtelTigo), debit/credit cards, and bank transfer through Hubtel.",
+        "Mobile Money only for now (MTN, Telecel, AirtelTigo) to 020 168 9882 — Ghana Institute of Procurement and Supply. Include your registration reference in the payment memo. Card and bank checkout via Hubtel will be enabled when approved.",
     },
     {
       question: "Will I receive a certificate?",

@@ -2,6 +2,7 @@ import type { GenericMutationCtx, GenericQueryCtx } from "convex/server";
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import type { DataModel, Id } from "./_generated/dataModel";
+import { isSelfServiceTicketKind } from "./lib/publicRegistration";
 import { canManageEvents, canViewRegistrations, requireAuth } from "./lib/rbac";
 import {
   ticketTypeKindValidator,
@@ -66,6 +67,11 @@ export const registerAttendee = mutation({
     }
     if (!ticketType.isActive) {
       throw new Error("This ticket type is not available");
+    }
+    if (!isSelfServiceTicketKind(ticketType.kind)) {
+      throw new Error(
+        "This pass type is not available for online registration. Contact the organisers."
+      );
     }
 
     const email = args.email.trim().toLowerCase();

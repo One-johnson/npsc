@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { mockEvent } from "@/lib/mock-event";
 import { buildFallbackBundle } from "@/lib/event/fallback-tickets";
 import type { PublicEventBundle, TicketTypeOption } from "@/lib/event/types";
+import { filterSelfServiceTicketTypes } from "@/lib/ticket-types/public-registration";
 
 function mapConvexToBundle(data: {
   event: {
@@ -64,8 +65,7 @@ function mapConvexToBundle(data: {
       registeredCount: event.registeredCount,
       about: event.about,
     },
-    ticketTypes: ticketTypes
-      .filter((t) => t.isActive)
+    ticketTypes: filterSelfServiceTicketTypes(ticketTypes.filter((t) => t.isActive))
       .sort((a, b) => a.sortOrder - b.sortOrder)
       .map(
         (t): TicketTypeOption => ({

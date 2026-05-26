@@ -1,5 +1,6 @@
 import type { MockEvent } from "@/lib/mock-event";
 import type { PublicEventBundle, TicketTypeOption } from "@/lib/event/types";
+import { filterSelfServiceTicketTypes } from "@/lib/ticket-types/public-registration";
 
 /** Matches seeded ticket kinds when Convex has no data yet. */
 const FALLBACK_KINDS: Omit<
@@ -12,7 +13,7 @@ const FALLBACK_KINDS: Omit<
     name: "Participant / Delegate",
     description:
       "Full conference access for procurement and supply professionals.",
-    price: 500,
+    price: 1500,
     currency: "GHS",
     perks: [
       "Full 2-day access",
@@ -26,11 +27,11 @@ const FALLBACK_KINDS: Omit<
   {
     kind: "vip",
     slug: "vip",
-    name: "VIP Delegate",
-    description: "Premium access with priority seating and networking.",
+    name: "International Delegate",
+    description: "Full conference access for delegates travelling from outside Ghana.",
     price: 1200,
     currency: "GHS",
-    perks: ["VIP lounge access", "Priority seating", "Exclusive networking"],
+    perks: ["Full 2-day access", "Priority registration desk", "International networking session"],
     isActive: true,
     sortOrder: 1,
   },
@@ -81,7 +82,9 @@ const FALLBACK_KINDS: Omit<
 ];
 
 export function buildFallbackBundle(event: MockEvent): PublicEventBundle {
-  const ticketTypes: TicketTypeOption[] = FALLBACK_KINDS.map((t) => ({
+  const ticketTypes: TicketTypeOption[] = filterSelfServiceTicketTypes(
+    FALLBACK_KINDS
+  ).map((t) => ({
     ...t,
     id: `mock-${t.kind}`,
     capacity: 500,

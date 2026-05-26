@@ -25,12 +25,5 @@ export const staffRegistrationSchema = z.object({
   path: ["confirmPassword"],
 });
 
-export const paymentSchema = z.object({
-  paymentMethod: z.enum(["momo", "card", "bank"], {
-    message: "Select a payment method",
-  }),
-});
-
 export type AttendeeRegistrationData = z.infer<typeof attendeeRegistrationSchema>;
 export type StaffRegistrationData = z.infer<typeof staffRegistrationSchema>;
-export type PaymentData = z.infer<typeof paymentSchema>;

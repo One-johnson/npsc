@@ -180,7 +180,7 @@ export function RegistrationDialog({
                   : "Join waitlist"
                 : form.formState.isSubmitting
                   ? "Submitting…"
-                  : "Continue to payment"}
+                  : "Continue"}
             </Button>
           </RegistrationModalFooter>
         </form>

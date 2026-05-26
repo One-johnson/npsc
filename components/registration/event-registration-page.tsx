@@ -21,6 +21,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { ManualMoMoPaymentInstructions } from "@/components/payments/manual-momo-payment-instructions";
 import { formatPrice } from "@/lib/format-price";
 import type { PublicEventBundle } from "@/lib/event/types";
 import {
@@ -30,7 +31,7 @@ import {
 
 const KIND_LABELS: Record<string, string> = {
   participant: "Participant",
-  vip: "VIP",
+  vip: "International",
   speaker: "Speaker",
   sponsor: "Sponsor",
   exhibitor: "Exhibitor",
@@ -102,7 +103,7 @@ export function EventRegistrationPage({ data }: Props) {
         );
       } else if (result.outcome === "pending") {
         router.push(
-          `/registration/${encodeURIComponent(result.confirmationCode)}?pay=1`
+          `/registration/${encodeURIComponent(result.confirmationCode)}`
         );
         return;
       } else {
@@ -142,6 +143,8 @@ export function EventRegistrationPage({ data }: Props) {
           {event.date} · {event.venue}, {event.city}
         </p>
       </div>
+
+      <ManualMoMoPaymentInstructions className="mt-8" showSteps={false} />
 
       <Tabs
         value={activeKind}

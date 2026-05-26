@@ -18,8 +18,8 @@ export function ConfirmationPreview() {
               Register once. Track everything online.
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Complete your delegate registration, pay securely through Hubtel,
-              and receive your certificate of attendance from GIPS after the event.
+              Complete your delegate registration, pay via Mobile Money to GIPS,
+              and receive your certificate of attendance after the event.
             </p>
           </div>
           <Card className="mx-auto w-full max-w-sm shadow-lg ring-2 ring-primary/15">
