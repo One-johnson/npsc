@@ -1,32 +1,67 @@
 "use client";
 
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useStaffSession } from "@/components/auth/session-provider";
+import { formatPrice } from "@/lib/format-price";
 
-export function DashboardStats() {
-  const { sessionToken } = useStaffSession();
-  const stats = useQuery(
-    api.events.dashboardStats,
-    sessionToken ? { sessionToken } : "skip"
-  );
+export type DashboardSummary = {
+  eventCount: number;
+  publishedEventCount: number;
+  ticketTypeCount: number;
+  totalCapacity: number;
+  totalSold: number;
+  staffCount: number;
+  totalRegistrations: number;
+  pending: number;
+  confirmed: number;
+  waitlisted: number;
+  cancelled: number;
+  certificatesIssued: number;
+  paymentCount: number;
+  totalRevenue: number;
+  primaryCurrency: string;
+};
 
-  if (stats === undefined) {
-    return <p className="text-sm text-muted-foreground">Loading statistics…</p>;
-  }
+type Props = {
+  summary: DashboardSummary;
+  showRegistrations?: boolean;
+  showFinance?: boolean;
+};
 
-  const cards = [
-    { label: "Events", value: stats.eventCount },
-    { label: "Published", value: stats.publishedEventCount },
-    { label: "Pass types", value: stats.ticketTypeCount },
-    { label: "Passes sold", value: stats.totalSold },
-    { label: "Total capacity", value: stats.totalCapacity },
-    { label: "Staff accounts", value: stats.staffCount },
+export function DashboardStats({
+  summary,
+  showRegistrations = false,
+  showFinance = false,
+}: Props) {
+  const cards: { label: string; value: string | number }[] = [
+    { label: "Events", value: summary.eventCount },
+    { label: "Published", value: summary.publishedEventCount },
+    { label: "Pass types", value: summary.ticketTypeCount },
+    { label: "Passes sold", value: summary.totalSold },
+    { label: "Total capacity", value: summary.totalCapacity },
+    { label: "Staff accounts", value: summary.staffCount },
   ];
 
+  if (showRegistrations) {
+    cards.push(
+      { label: "Registrations", value: summary.totalRegistrations },
+      { label: "Confirmed", value: summary.confirmed },
+      { label: "Pending payment", value: summary.pending },
+      { label: "Certificates issued", value: summary.certificatesIssued }
+    );
+  }
+
+  if (showFinance) {
+    cards.push(
+      {
+        label: "Revenue collected",
+        value: formatPrice(summary.totalRevenue, summary.primaryCurrency),
+      },
+      { label: "Payments", value: summary.paymentCount }
+    );
+  }
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {cards.map((card) => (
         <Card key={card.label}>
           <CardHeader className="pb-2">
@@ -35,7 +70,7 @@ export function DashboardStats() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{card.value}</p>
+            <p className="text-3xl font-bold tabular-nums">{card.value}</p>
           </CardContent>
         </Card>
       ))}

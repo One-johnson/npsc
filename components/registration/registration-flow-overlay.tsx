@@ -31,18 +31,18 @@ const COPY: Record<
     description: "Please wait while we secure your spot…",
   },
   "redirecting-to-payment": {
-    title: "Registration complete",
+    title: "Registration saved",
     description:
-      "Your details have been saved. Redirecting you to payment to confirm your pass.",
+      "Redirecting you to Mobile Money payment details and your reference code.",
   },
   "processing-payment": {
-    title: "Processing payment",
-    description: "Please wait while we confirm your payment…",
+    title: "Saving registration",
+    description: "Please wait…",
   },
   "payment-success": {
-    title: "Thank you for registering",
+    title: "Registration saved",
     description:
-      "Your registration is confirmed. Save your reference code — you will use it to check status and download your certificate when issued.",
+      "Send your pass fee via Mobile Money using the details on the next screen. GIPS will confirm after verification.",
   },
   "waitlist-complete": {
     title: "You’re on the waitlist",

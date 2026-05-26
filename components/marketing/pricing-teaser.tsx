@@ -2,11 +2,13 @@ import { Check } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RegisterButton } from "@/components/registration/register-button";
 import { SectionHeading } from "@/components/marketing/section-heading";
+import { ManualMoMoPaymentInstructions } from "@/components/payments/manual-momo-payment-instructions";
 import { formatPrice, mockEvent } from "@/lib/mock-event";
 
 const included = [
   "Full 2-day conference access",
-  "Secure online registration & payment",
+  "Secure online registration",
+  "Mobile Money payment to GIPS",
   "Networking sessions & exhibition",
   "Certificate of attendance (issued after the event by GIPS)",
 ];
@@ -18,7 +20,7 @@ export function PricingTeaser() {
         <SectionHeading
           eyebrow="Registration"
           title="Secure your conference seat"
-          description="Register online, then complete payment via Hubtel — Mobile Money, card, or bank."
+          description="Register online, then pay via Mobile Money using the GIPS MoMo details on this page."
         />
         <Card className="mx-auto mt-12 max-w-lg ring-2 ring-primary">
           <CardHeader className="text-center">
@@ -46,8 +48,14 @@ export function PricingTeaser() {
               ))}
             </ul>
             <RegisterButton className="h-11 w-full text-base" size="lg">
-              Register & pay
+              Register now
             </RegisterButton>
+            <ManualMoMoPaymentInstructions
+              amount={mockEvent.registrationFee}
+              currency={mockEvent.registrationCurrency}
+              showSteps={false}
+              className="text-left"
+            />
           </CardContent>
         </Card>
       </div>

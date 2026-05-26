@@ -17,10 +17,7 @@ import { mockEvent } from "@/lib/mock-event";
 import { allActiveTicketTypesSoldOut } from "@/lib/event/capacity";
 import { useConferenceEvent } from "@/hooks/use-conference-event";
 import type { PublicEventBundle, TicketTypeOption } from "@/lib/event/types";
-import type {
-  AttendeeRegistrationData,
-  PaymentData,
-} from "@/lib/validations/registration";
+import type { AttendeeRegistrationData } from "@/lib/validations/registration";
 import {
   clearPendingRegistration,
   savePendingRegistration,
@@ -39,7 +36,6 @@ type RegistrationFlowContextValue = {
   openRegistration: (ticketKind?: string) => void;
   bundle: PublicEventBundle;
   isLoading: boolean;
-  /** All active pass types are sold out — CTA should offer waitlist. */
   allTicketTypesSoldOut: boolean;
 };
 
@@ -55,7 +51,6 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
   }, [pathname]);
   const { bundle, isLoading } = useConferenceEvent(eventSlug);
   const registerAttendee = useMutation(api.registrations.registerAttendee);
-  const confirmPayment = useMutation(api.payments.confirmRegistrationPayment);
 
   const [ticketDialogOpen, setTicketDialogOpen] = useState(false);
   const [formDialogOpen, setFormDialogOpen] = useState(false);
@@ -68,6 +63,16 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
     null
   );
 
+  const goToRegistrationStatus = useCallback(
+    (confirmationCode: string) => {
+      clearPendingRegistration();
+      setPending(null);
+      setSelectedTicket(null);
+      router.push(`/registration/${encodeURIComponent(confirmationCode)}`);
+    },
+    [router]
+  );
+
   const openRegistration = useCallback(
     (ticketKind?: string) => {
       if (ticketKind) {
@@ -78,7 +83,6 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
           return;
         }
       }
-
       setTicketDialogOpen(true);
     },
     [bundle]
@@ -95,15 +99,18 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
     setTicketDialogOpen(true);
   }, []);
 
-  const handlePaymentBack = useCallback(() => {
-    if (!pending) return;
-    const ticket = bundle.ticketTypes.find(
-      (t) => t.id === pending.ticketTypeId
-    );
-    if (ticket) setSelectedTicket(ticket);
+  const handlePaymentDone = useCallback(() => {
+    const code = pending?.confirmationCode;
     setPaymentDialogOpen(false);
-    setFormDialogOpen(true);
-  }, [bundle.ticketTypes, pending]);
+    clearPendingRegistration();
+    setPending(null);
+    setSelectedTicket(null);
+    if (code) {
+      router.push(`/registration/${encodeURIComponent(code)}`);
+    } else {
+      router.push("/");
+    }
+  }, [pending, router]);
 
   const handleFormSuccess = useCallback(
     async (data: AttendeeRegistrationData) => {
@@ -135,9 +142,7 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
           setOverlay({ phase: "waitlist-complete" });
           await delay(1800);
           setOverlay(null);
-          router.push(
-            `/registration/${encodeURIComponent(result.confirmationCode)}`
-          );
+          goToRegistrationStatus(result.confirmationCode);
         } catch (e) {
           setOverlay(null);
           toast.error(
@@ -161,30 +166,19 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
             position: data.position,
             paymentCompleted: false,
           });
+          setFormDialogOpen(false);
+          setSelectedTicket(null);
           if (result.outcome === "waitlisted") {
-            setFormDialogOpen(false);
-            setSelectedTicket(null);
             setOverlay({ phase: "waitlist-complete" });
             await delay(1800);
             setOverlay(null);
-            router.push(
-              `/registration/${encodeURIComponent(result.confirmationCode)}`
-            );
+            goToRegistrationStatus(result.confirmationCode);
             return;
           }
-          const saved = savePendingRegistration(
-            bundle.event.slug,
-            selectedTicket,
-            data,
-            bundle.isLive,
-            result.confirmationCode
-          );
-          setPending(saved);
-          setFormDialogOpen(false);
           setOverlay({ phase: "redirecting-to-payment" });
-          await delay(1600);
+          await delay(1400);
           setOverlay(null);
-          setPaymentDialogOpen(true);
+          goToRegistrationStatus(result.confirmationCode);
         } catch (e) {
           setOverlay(null);
           toast.error(e instanceof Error ? e.message : "Registration failed");
@@ -202,65 +196,11 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
       setPending(saved);
       setFormDialogOpen(false);
       setOverlay({ phase: "redirecting-to-payment" });
-      await delay(1200);
+      await delay(1000);
       setOverlay(null);
       setPaymentDialogOpen(true);
     },
-    [bundle, registerAttendee, router, selectedTicket]
-  );
-
-  const handlePaymentComplete = useCallback(
-    async (registration: PendingRegistration, payment: PaymentData) => {
-      if (
-        bundle?.isLive &&
-        !registration.ticketTypeId.startsWith("mock-") &&
-        registration.confirmationCode
-      ) {
-        setPaymentDialogOpen(false);
-        setOverlay({ phase: "processing-payment" });
-        try {
-          await confirmPayment({
-            confirmationCode: registration.confirmationCode,
-            amount: registration.price,
-            currency: registration.currency,
-            method: payment.paymentMethod,
-            provider: "mock",
-          });
-          clearPendingRegistration();
-          setSelectedTicket(null);
-          setPending(null);
-          setOverlay({
-            phase: "payment-success",
-            confirmationCode: registration.confirmationCode,
-          });
-          await delay(3200);
-          setOverlay(null);
-          router.push(
-            `/registration/${encodeURIComponent(registration.confirmationCode)}`
-          );
-        } catch (e) {
-          setOverlay(null);
-          toast.error(e instanceof Error ? e.message : "Payment failed");
-          throw e;
-        }
-        return;
-      }
-
-      setOverlay({ phase: "processing-payment" });
-      await delay(800);
-      clearPendingRegistration();
-      setPaymentDialogOpen(false);
-      setSelectedTicket(null);
-      setPending(null);
-      setOverlay({
-        phase: "payment-success",
-        confirmationCode: registration.confirmationCode,
-      });
-      await delay(2800);
-      setOverlay(null);
-      router.push("/");
-    },
-    [bundle?.isLive, confirmPayment, router]
+    [bundle, registerAttendee, goToRegistrationStatus, selectedTicket]
   );
 
   const allTicketTypesSoldOut = useMemo(
@@ -328,8 +268,7 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
             setPaymentDialogOpen(open);
             if (!open) setPending(null);
           }}
-          onBack={handlePaymentBack}
-          onComplete={(payment) => handlePaymentComplete(pending, payment)}
+          onDone={handlePaymentDone}
         />
       ) : null}
 

@@ -7,27 +7,19 @@ import { Button } from "@/components/ui/button";
 import { RegistrationStatusCard } from "@/components/registration/registration-status-card";
 import { RegistrationPendingPayment } from "@/components/registration/registration-pending-payment";
 import { api } from "@/convex/_generated/api";
-import { useConferenceEvent } from "@/hooks/use-conference-event";
 import { mockEvent } from "@/lib/mock-event";
 import type { PendingRegistration } from "@/lib/registration-storage";
 
 type Props = {
   confirmationCode: string;
-  openPayment?: boolean;
 };
 
-export function RegistrationStatusContent({
-  confirmationCode,
-  openPayment = false,
-}: Props) {
+export function RegistrationStatusContent({ confirmationCode }: Props) {
   const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
   const lookup = useQuery(
     api.registrations.getByConfirmationCode,
     convexUrl ? { confirmationCode } : "skip"
   );
-
-  const eventSlug = lookup?.event.slug ?? mockEvent.slug;
-  const { bundle } = useConferenceEvent(eventSlug);
 
   const pendingCheckout = useMemo((): PendingRegistration | null => {
     if (!lookup || lookup.registration.status !== "pending") return null;
@@ -87,11 +79,7 @@ export function RegistrationStatusContent({
       />
 
       {pendingCheckout ? (
-        <RegistrationPendingPayment
-          bundle={bundle}
-          registration={pendingCheckout}
-          autoOpen={openPayment}
-        />
+        <RegistrationPendingPayment registration={pendingCheckout} />
       ) : null}
 
       <Button

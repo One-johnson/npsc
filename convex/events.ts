@@ -4,6 +4,7 @@ import type { Id, DataModel } from "./_generated/dataModel";
 import type { GenericMutationCtx } from "convex/server";
 import type { GenericId } from "convex/values";
 import { DEFAULT_HERO_IMAGE, EMPTY_EVENT_CONTENT } from "./lib/eventDefaults";
+import { filterSelfServiceTicketTypes } from "./lib/publicRegistration";
 import { canManageEvents, requireAuth } from "./lib/rbac";
 
 type MutationCtx = GenericMutationCtx<DataModel>;
@@ -97,9 +98,9 @@ export const getBySlug = query({
       .query("ticketTypes")
       .withIndex("by_event", (q) => q.eq("eventId", event._id))
       .collect();
-    const activeTickets = ticketTypes
-      .filter((t) => t.isActive)
-      .sort((a, b) => a.sortOrder - b.sortOrder);
+    const activeTickets = filterSelfServiceTicketTypes(
+      ticketTypes.filter((t) => t.isActive)
+    ).sort((a, b) => a.sortOrder - b.sortOrder);
     return { event, ticketTypes: activeTickets };
   },
 });

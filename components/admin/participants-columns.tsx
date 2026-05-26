@@ -42,7 +42,7 @@ export type ParticipantRow = {
 
 const KIND_LABELS: Record<string, string> = {
   participant: "Participant",
-  vip: "VIP",
+  vip: "International",
   speaker: "Speaker",
   sponsor: "Sponsor",
   exhibitor: "Exhibitor",

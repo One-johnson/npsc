@@ -45,7 +45,7 @@ const NPSC_SEED = {
     features: [
       { icon: "users", title: "Ghana's flagship procurement forum", description: "Connect with peers from government, academia, and industry under one roof." },
       { icon: "zap", title: "Fast digital registration", description: "Register in minutes online and track your status with a reference code." },
-      { icon: "credit-card", title: "Secure Hubtel payments", description: "Pay with Mobile Money, card, or bank transfer — safe and convenient." },
+      { icon: "credit-card", title: "Mobile Money payment", description: "Pay via MoMo to GIPS after registering — card and bank checkout coming soon." },
       { icon: "award", title: "Certificate of attendance", description: "Receive your NPSC certificate digitally once issued by the organisers." },
       { icon: "shield", title: "Trusted conveners", description: "Organised by GIPS and partners committed to procurement excellence in Ghana." },
     ],
@@ -57,14 +57,14 @@ const NPSC_SEED = {
     ],
     steps: [
       { step: 1, title: "Register your details", description: "Fill in your name, email, and phone to reserve your seat." },
-      { step: 2, title: "Pay securely via Hubtel", description: "Complete payment with MoMo, card, or bank transfer." },
+      { step: 2, title: "Pay via Mobile Money", description: "Send the pass fee to GIPS using the MoMo number on your registration status page." },
       { step: 3, title: "Save your reference code", description: "Use your registration reference to check status and complete payment if needed." },
       { step: 4, title: "Receive your certificate", description: "After the conference, GIPS issues certificates through official channels." },
     ],
     faqs: [
       { question: "Who should attend NPSC 2026?", answer: "Procurement and supply chain professionals in the public and private sectors, vendors, academics, students, and anyone interested in improving procurement outcomes in Ghana." },
       { question: "Where is the conference held?", answer: "UPSA Auditorium, University of Professional Studies, Accra, Ghana — 2–3 September 2026." },
-      { question: "What payment methods are accepted?", answer: "Mobile Money (MTN, Telecel, AirtelTigo), debit/credit cards, and bank transfer through Hubtel." },
+      { question: "What payment methods are accepted?", answer: "Mobile Money only for now (MTN, Telecel, AirtelTigo) to 020 168 9882 — Ghana Institute of Procurement and Supply. Include your registration reference in the payment memo." },
       { question: "Will I receive a certificate?", answer: "Confirmed delegates receive a certificate of attendance after the conference, issued and distributed by GIPS — not via self-service download." },
       { question: "Can I register on behalf of my organisation?", answer: "Yes. Use the corporate package for teams, or register multiple standard passes with individual attendee details." },
     ],
@@ -82,7 +82,7 @@ const NPSC_SEED = {
       kind: "participant" as const,
       name: "Participant / Delegate",
       description: "Full conference access for procurement and supply professionals.",
-      price: 500,
+      price: 1500,
       currency: "GHS",
       capacity: 800,
       perks: ["Full 2-day access", "Lunch on both days", "Exhibition hall access", "Certificate of attendance"],
@@ -91,12 +91,12 @@ const NPSC_SEED = {
     {
       slug: "vip",
       kind: "vip" as const,
-      name: "VIP Delegate",
-      description: "Premium access with priority seating and networking.",
+      name: "International Delegate",
+      description: "Full conference access for delegates travelling from outside Ghana.",
       price: 1200,
       currency: "GHS",
       capacity: 100,
-      perks: ["VIP lounge access", "Priority seating", "Exclusive networking session"],
+      perks: ["Full 2-day access", "Priority registration desk", "International networking session"],
       sortOrder: 1,
     },
     {
@@ -242,6 +242,54 @@ export const bootstrap = mutation({
       eventId: event._id,
       eventSlug: event.slug,
     };
+  },
+});
+
+/** Updates participant / international ticket rows on an already-seeded database. */
+export const syncNpscTicketCatalog = mutation({
+  args: { secret: v.string() },
+  handler: async (ctx, args) => {
+    const expectedSecret = process.env.SEED_SECRET;
+    if (!expectedSecret || args.secret !== expectedSecret) {
+      throw new Error("Invalid seed secret");
+    }
+
+    const event = await ctx.db
+      .query("events")
+      .withIndex("by_slug", (q) => q.eq("slug", NPSC_SEED.event.slug))
+      .unique();
+    if (!event) {
+      throw new Error("NPSC event not found");
+    }
+
+    const tickets = await ctx.db
+      .query("ticketTypes")
+      .withIndex("by_event", (q) => q.eq("eventId", event._id))
+      .collect();
+
+    const catalogBySlug = new Map(
+      NPSC_SEED.ticketTypes.map((t) => [t.slug, t])
+    );
+
+    const updated: string[] = [];
+    const now = Date.now();
+
+    for (const ticket of tickets) {
+      const defaults = catalogBySlug.get(ticket.slug);
+      if (!defaults || (ticket.slug !== "participant" && ticket.slug !== "vip")) {
+        continue;
+      }
+      await ctx.db.patch(ticket._id, {
+        name: defaults.name,
+        description: defaults.description,
+        price: defaults.price,
+        perks: defaults.perks,
+        updatedAt: now,
+      });
+      updated.push(ticket.slug);
+    }
+
+    return { eventSlug: event.slug, updated };
   },
 });
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DashboardStats } from "@/components/admin/dashboard-stats";
+import { DashboardReporting } from "@/components/admin/dashboard-reporting";
 import { EventsTable } from "@/components/admin/events-table";
 import { buttonVariants } from "@/components/ui/button";
 
@@ -14,7 +14,7 @@ export default function AdminDashboardPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
           <p className="mt-1 text-muted-foreground">
-            Overview of events, tickets, and staff for the platform.
+            Real-time overview of events, registrations, payments, and passes.
           </p>
         </div>
         <Link
@@ -24,7 +24,7 @@ export default function AdminDashboardPage() {
           All events
         </Link>
       </div>
-      <DashboardStats />
+      <DashboardReporting />
       <section className="space-y-4">
         <div>
           <h2 className="text-lg font-semibold">Events</h2>

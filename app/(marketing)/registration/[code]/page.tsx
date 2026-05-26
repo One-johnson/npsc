@@ -3,15 +3,10 @@ import { mockEvent } from "@/lib/mock-event";
 
 type Props = {
   params: Promise<{ code: string }>;
-  searchParams: Promise<{ pay?: string }>;
 };
 
-export default async function RegistrationStatusPage({
-  params,
-  searchParams,
-}: Props) {
+export default async function RegistrationStatusPage({ params }: Props) {
   const { code } = await params;
-  const { pay } = await searchParams;
   const decoded = decodeURIComponent(code);
 
   return (
@@ -26,10 +21,7 @@ export default async function RegistrationStatusPage({
             Save your reference code to check payment status or download your
             certificate when issued.
           </p>
-          <RegistrationStatusContent
-            confirmationCode={decoded}
-            openPayment={pay === "1"}
-          />
+          <RegistrationStatusContent confirmationCode={decoded} />
         </div>
       </div>
     </section>

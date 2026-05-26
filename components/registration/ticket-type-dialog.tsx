@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 const KIND_LABELS: Record<string, string> = {
   participant: "Participant",
-  vip: "VIP",
+  vip: "International",
   speaker: "Speaker",
   sponsor: "Sponsor",
   exhibitor: "Exhibitor",
@@ -59,16 +59,6 @@ export function TicketTypeDialog({
       </RegistrationModalHeader>
 
       <RegistrationModalBody className="grid gap-4">
-        {!bundle.isLive ? (
-          <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-900 dark:text-amber-200">
-            Preview mode — run database setup at{" "}
-            <a href="/admin/setup" className="font-medium underline">
-              /admin/setup
-            </a>{" "}
-            to save registrations to the server.
-          </p>
-        ) : null}
-
         <div className="grid gap-3 sm:grid-cols-2">
           {ticketTypes.map((ticket) => {
             const spotsLeft = ticket.capacity - ticket.soldCount;
