@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useRegistrationFlow } from "@/components/registration/registration-flow-provider";
 
 type Props = ComponentProps<typeof Button> & {
-  /** Pre-select ticket kind: participant, speaker, exhibitor */
+  /** Pre-select ticket kind: participant, student, exhibitor (exhibition package) */
   ticketKind?: string;
   /** Override label (default: Register or Join waitlist). */
   children?: React.ReactNode;

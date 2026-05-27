@@ -17,6 +17,13 @@ const included = [
   "Certificate of attendance (issued after the event by GIPS)",
 ];
 
+const exhibitorIncluded = [
+  "One exhibition booth",
+  "Meals for one representative",
+  "One table and two chairs",
+  "Space allocation only (branding and booth customization excluded)",
+];
+
 export function PricingTeaser() {
   return (
     <MotionSection
@@ -34,47 +41,111 @@ export function PricingTeaser() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
-          className="mx-auto mt-12 max-w-lg"
+          className="mt-12"
         >
-          <motion.div variants={fadeUp}>
-            <Card className="ring-2 ring-primary">
-              <CardHeader className="text-center">
-                <CardTitle className="text-xl">Conference registration</CardTitle>
-                <p className="pt-2 text-4xl font-bold text-primary">
-                  {formatPrice(
-                    mockEvent.registrationFee,
-                    mockEvent.registrationCurrency
-                  )}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {mockEvent.date} · {mockEvent.venue}
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <motion.ul variants={staggerContainer} className="space-y-2">
-                  {included.map((item) => (
-                    <motion.li
-                      key={item}
-                      variants={fadeUp}
-                      className="flex items-start gap-2 text-sm text-muted-foreground"
-                    >
-                      <Check className="mt-0.5 size-4 shrink-0 text-primary" />
-                      {item}
-                    </motion.li>
-                  ))}
-                </motion.ul>
-                <RegisterButton className="h-11 w-full text-base" size="lg">
-                  Register now
-                </RegisterButton>
-                <ManualMoMoPaymentInstructions
-                  amount={mockEvent.registrationFee}
-                  currency={mockEvent.registrationCurrency}
-                  showSteps={false}
-                  className="text-left"
-                />
-              </CardContent>
-            </Card>
-          </motion.div>
+          <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
+            <motion.div variants={fadeUp}>
+              <Card className="ring-2 ring-primary">
+                <CardHeader className="text-left">
+                  <CardTitle className="text-xl">Registration details</CardTitle>
+                  <div className="pt-3 space-y-1">
+                    <p className="text-base font-semibold text-foreground">
+                      Participant:{" "}
+                      <span className="font-bold text-primary">
+                        {formatPrice(1500, "GHS")}
+                      </span>
+                    </p>
+                    <p className="text-base font-semibold text-foreground">
+                      Student:{" "}
+                      <span className="font-bold text-primary">
+                        {formatPrice(200, "GHS")}
+                      </span>{" "}
+                      <span className="text-sm font-normal text-muted-foreground">
+                        (student ID upload required)
+                      </span>
+                    </p>
+                    <p className="text-base font-semibold text-foreground">
+                      Exhibition Package:{" "}
+                      <span className="font-bold text-primary">
+                        {formatPrice(5000, "GHS")}
+                      </span>
+                    </p>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {mockEvent.date} · {mockEvent.venue}
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm font-semibold">
+                        Conference passes include
+                      </p>
+                      <motion.ul
+                        variants={staggerContainer}
+                        className="mt-2 space-y-2"
+                      >
+                        {included.map((item) => (
+                          <motion.li
+                            key={item}
+                            variants={fadeUp}
+                            className="flex items-start gap-2 text-sm text-muted-foreground"
+                          >
+                            <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                            {item}
+                          </motion.li>
+                        ))}
+                      </motion.ul>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold">
+                        Exhibition Package includes
+                      </p>
+                      <motion.ul
+                        variants={staggerContainer}
+                        className="mt-2 space-y-2"
+                      >
+                        {exhibitorIncluded.map((item) => (
+                          <motion.li
+                            key={item}
+                            variants={fadeUp}
+                            className="flex items-start gap-2 text-sm text-muted-foreground"
+                          >
+                            <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                            {item}
+                          </motion.li>
+                        ))}
+                      </motion.ul>
+                    </div>
+                  </div>
+
+                  <RegisterButton className="h-11 w-full text-base" size="lg">
+                    Register now
+                  </RegisterButton>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div variants={fadeUp}>
+              <Card>
+                <CardHeader className="text-left">
+                  <CardTitle className="text-xl">Payment details</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    After registering, complete payment using the GIPS Mobile Money
+                    or bank transfer instructions below.
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <ManualMoMoPaymentInstructions
+                    amount={1500}
+                    currency="GHS"
+                    showSteps={false}
+                    className="text-left"
+                  />
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
         </motion.div>
       </div>
     </MotionSection>
