@@ -28,14 +28,16 @@ export function PricingTeaser() {
   return (
     <MotionSection
       id="register"
-      className="border-y border-border/60 bg-muted/20 py-16 md:py-24"
+      className="border-y border-border/60 bg-emerald-500/40 py-16 md:py-24 dark:bg-emerald-950/40"
     >
       <div className="container mx-auto max-w-6xl px-4 md:px-6">
-        <SectionHeading
-          eyebrow="Registration"
-          title="Secure your conference seat"
-          description="Register online, then pay via Mobile Money or bank transfer using the GIPS details on this page."
-        />
+        <div className="text-foreground">
+          <SectionHeading
+            eyebrow="Registration"
+            title="Secure your conference seat"
+            description="Register online, then pay via Mobile Money or bank transfer using the GIPS details on this page."
+          />
+        </div>
         <motion.div
           variants={staggerContainer}
           initial="hidden"
@@ -45,7 +47,7 @@ export function PricingTeaser() {
         >
           <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
             <motion.div variants={fadeUp}>
-              <Card className="ring-2 ring-primary">
+              <Card className="ring-2 ring-primary transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/70 hover:shadow-xl hover:shadow-emerald-900/10 hover:ring-primary/70 dark:hover:bg-white/5 dark:hover:shadow-emerald-400/10">
                 <CardHeader className="text-left">
                   <CardTitle className="text-xl">Registration details</CardTitle>
                   <div className="pt-3 space-y-1">
@@ -127,7 +129,7 @@ export function PricingTeaser() {
             </motion.div>
 
             <motion.div variants={fadeUp}>
-              <Card>
+              <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/70 hover:shadow-xl hover:shadow-emerald-900/10 hover:ring-1 hover:ring-emerald-600/25 dark:hover:bg-white/5 dark:hover:shadow-emerald-400/10">
                 <CardHeader className="text-left">
                   <CardTitle className="text-xl">Payment details</CardTitle>
                   <p className="text-sm text-muted-foreground">

@@ -2,6 +2,7 @@ import { Hero } from "@/components/marketing/hero";
 import { OrganizersStrip } from "@/components/marketing/organizers-strip";
 import { ProofStrip } from "@/components/marketing/proof-strip";
 import { ConfirmationPreview } from "@/components/marketing/confirmation-preview";
+import { Gallery } from "@/components/marketing/gallery";
 import { WhyAttend } from "@/components/marketing/why-attend";
 import { FeatureGrid } from "@/components/marketing/feature-grid";
 import { AudienceCarousel } from "@/components/marketing/audience-carousel";
@@ -17,6 +18,7 @@ export default function HomePage() {
       <OrganizersStrip />
       <ProofStrip />
       <ConfirmationPreview />
+      <Gallery />
       <WhyAttend />
       <FeatureGrid />
       <AudienceCarousel />
