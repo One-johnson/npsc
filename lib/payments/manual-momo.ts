@@ -9,7 +9,7 @@ export const MANUAL_MOMO_PAYMENT = {
 
 export const MANUAL_MOMO_PAYMENT_INSTRUCTIONS = [
   "Register online and save your reference code.",
-  `Send the exact pass fee via Mobile Money to ${MANUAL_MOMO_PAYMENT.numberDisplay}.`,
-  `Use your reference code as the payment description or memo.`,
+  "Send the exact pass fee via Mobile Money or bank transfer using the details below.",
+  "Use your reference code as the payment description or memo.",
   "GIPS will confirm your registration after payment is verified (usually within 1–2 business days).",
 ] as const;

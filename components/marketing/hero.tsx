@@ -1,10 +1,8 @@
 ﻿"use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, MapPin } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { RegisterButton } from "@/components/registration/register-button";
 import { mockEvent } from "@/lib/mock-event";
 import { fadeUp, staggerContainer } from "@/components/motion";
@@ -55,7 +53,7 @@ export function Hero() {
             >
               {mockEvent.tagline}
             </motion.p>
-            <motion.div variants={fadeUp} className="mt-8 flex flex-wrap gap-3">
+            <motion.div variants={fadeUp} className="mt-8">
               <RegisterButton
                 size="lg"
                 className="h-11 bg-white px-8 text-base font-semibold text-primary hover:bg-white/90"
@@ -63,15 +61,6 @@ export function Hero() {
                 Register now
                 <ArrowRight className="ml-1 size-4" />
               </RegisterButton>
-              <Link href={`/events/${mockEvent.slug}`}>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="h-11 border-primary-foreground/40 bg-transparent px-8 text-base text-primary-foreground hover:bg-primary-foreground/10"
-                >
-                  Full programme
-                </Button>
-              </Link>
             </motion.div>
             <motion.p
               variants={fadeUp}

@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import { MapPin, Calendar, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { RegisterButton } from "@/components/registration/register-button";
-import { SchedulePreview } from "@/components/marketing/schedule-preview";
 import { PricingTeaser } from "@/components/marketing/pricing-teaser";
 import { getEventBySlug, mockEvent } from "@/lib/mock-event";
 
@@ -46,7 +45,6 @@ export default async function EventDetailPage({ params }: Props) {
           </RegisterButton>
         </div>
       </section>
-      <SchedulePreview />
       <PricingTeaser />
     </>
   );

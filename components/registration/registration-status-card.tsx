@@ -73,7 +73,8 @@ export function RegistrationStatusCard({
         ) : null}
         {status === "pending" ? (
           <p className="text-muted-foreground">
-            Send your pass fee via Mobile Money using the payment details below.
+            Send your pass fee via Mobile Money or bank transfer using the
+            payment details below.
             Include this reference in your payment memo. GIPS will confirm your
             registration after verification.
           </p>

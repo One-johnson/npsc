@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { EventRegistrationLoader } from "@/components/registration/event-registration-loader";
+import { ResponsiveRegister } from "@/components/registration/responsive-register";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -21,7 +21,7 @@ export default async function RegisterPage({ params }: Props) {
         <p className="py-24 text-center text-muted-foreground">Loading…</p>
       }
     >
-      <EventRegistrationLoader slug={slug} />
+      <ResponsiveRegister slug={slug} />
     </Suspense>
   );
 }

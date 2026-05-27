@@ -3,6 +3,12 @@ import type { TicketTypeOption } from "@/lib/event/types";
 
 const KEY = "event_pending_registration";
 
+function generateConfirmationCode(): string {
+  const segment = () =>
+    Math.random().toString(36).slice(2, 6).toUpperCase();
+  return `EVT-${segment()}-${segment()}`;
+}
+
 export type PendingRegistration = AttendeeRegistrationData & {
   eventSlug: string;
   ticketTypeName: string;
@@ -31,7 +37,7 @@ export function savePendingRegistration(
     currency: ticket.currency,
     isLive,
     createdAt: new Date().toISOString(),
-    confirmationCode,
+    confirmationCode: confirmationCode ?? generateConfirmationCode(),
   };
   if (typeof window !== "undefined") {
     sessionStorage.setItem(KEY, JSON.stringify(pending));
@@ -42,10 +48,11 @@ export function savePendingRegistration(
 export function getPendingRegistration(): PendingRegistration | null {
   if (typeof window === "undefined") return null;
   const raw = sessionStorage.getItem(KEY);
-  if (!raw) return null;
+  if (!raw?.trim()) return null;
   try {
     return JSON.parse(raw) as PendingRegistration;
   } catch {
+    sessionStorage.removeItem(KEY);
     return null;
   }
 }

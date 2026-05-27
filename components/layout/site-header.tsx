@@ -4,10 +4,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { RegisterButton } from "@/components/registration/register-button";
 import { mockEvent } from "@/lib/mock-event";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const navLinks = [
   { href: "#about", label: "About" },
@@ -18,6 +20,18 @@ const navLinks = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const isMobile = useIsMobile();
+
+  const eventSlug = (() => {
+    const mRegister = pathname.match(/^\/register\/([^/]+)/);
+    if (mRegister?.[1]) return decodeURIComponent(mRegister[1]);
+    const mEvent = pathname.match(/^\/events\/([^/]+)/);
+    if (mEvent?.[1]) return decodeURIComponent(mEvent[1]);
+    return mockEvent.slug;
+  })();
+
+  const mobileRegisterHref = `/register/${encodeURIComponent(eventSlug)}`;
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/95 backdrop-blur-md">
       <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-6">
@@ -65,15 +79,26 @@ export function SiteHeader() {
           <RegisterButton size="sm" />
         </div>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={() => setOpen(!open)}
-          aria-label={open ? "Close menu" : "Open menu"}
-        >
-          {open ? <X className="size-5" /> : <Menu className="size-5" />}
-        </Button>
+        <div className="flex items-center gap-2 md:hidden">
+          {isMobile ? (
+            <Button
+              size="sm"
+              nativeButton={false}
+              render={<Link href={mobileRegisterHref} />}
+              onClick={() => setOpen(false)}
+            >
+              Register
+            </Button>
+          ) : null}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setOpen(!open)}
+            aria-label={open ? "Close menu" : "Open menu"}
+          >
+            {open ? <X className="size-5" /> : <Menu className="size-5" />}
+          </Button>
+        </div>
       </div>
 
       <div

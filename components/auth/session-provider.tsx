@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import type { StaffUser } from "@/lib/auth/types";
+import { parseJsonResponse } from "@/lib/http/parse-json-response";
 
 type SessionContextValue = {
   user: StaffUser | null;
@@ -41,12 +42,12 @@ export function SessionProvider({
     setIsLoading(true);
     try {
       const res = await fetch("/api/auth/token", { credentials: "include" });
-      const data = (await res.json()) as {
+      const data = await parseJsonResponse<{
         token: string | null;
         user: StaffUser | null;
-      };
-      setSessionToken(data.token);
-      setUser(data.user);
+      }>(res);
+      setSessionToken(data?.token ?? null);
+      setUser(data?.user ?? null);
     } catch {
       setSessionToken(null);
       setUser(null);
