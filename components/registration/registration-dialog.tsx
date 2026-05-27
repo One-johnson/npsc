@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { Id } from "@/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,8 +20,9 @@ import {
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/format-price";
 import type { PublicEventBundle, TicketTypeOption } from "@/lib/event/types";
+import { StudentIdUpload } from "@/components/registration/student-id-upload";
 import {
-  attendeeRegistrationSchema,
+  attendeeRegistrationSchemaForKind,
   type AttendeeRegistrationData,
 } from "@/lib/validations/registration";
 
@@ -48,9 +50,16 @@ export function RegistrationDialog({
   initialData,
 }: Props) {
   const { event } = bundle;
+  const isStudent = ticket.kind === "student";
+  const schema = useMemo(
+    () => attendeeRegistrationSchemaForKind(ticket.kind),
+    [ticket.kind]
+  );
+  const [studentIdPreview, setStudentIdPreview] = useState<string | null>(null);
 
   const form = useForm<AttendeeRegistrationData>({
-    resolver: zodResolver(attendeeRegistrationSchema),
+    resolver: zodResolver(schema),
+    mode: "onSubmit",
     defaultValues: {
       ticketTypeId: ticket.id,
       fullName: "",
@@ -58,6 +67,7 @@ export function RegistrationDialog({
       phone: "",
       organization: "",
       position: "",
+      studentIdStorageId: "",
     },
   });
 
@@ -75,7 +85,9 @@ export function RegistrationDialog({
         phone: initialData?.phone ?? "",
         organization: initialData?.organization ?? "",
         position: initialData?.position ?? "",
+        studentIdStorageId: initialData?.studentIdStorageId ?? "",
       });
+      setStudentIdPreview(null);
     }
     wasOpen.current = open;
   }, [open, ticket.id, initialData, form]);
@@ -90,7 +102,9 @@ export function RegistrationDialog({
         phone: "",
         organization: "",
         position: "",
+        studentIdStorageId: "",
       });
+      setStudentIdPreview(null);
     } catch {
       // Parent shows overlay error via toast; keep form data for retry.
     }
@@ -165,6 +179,22 @@ export function RegistrationDialog({
             error={form.formState.errors.position?.message}
             inputProps={form.register("position")}
           />
+          {isStudent ? (
+            <StudentIdUpload
+              value={form.watch("studentIdStorageId")}
+              previewUrl={studentIdPreview}
+              disabled={form.formState.isSubmitting}
+              error={form.formState.errors.studentIdStorageId?.message}
+              onChange={(storageId, preview) => {
+                setStudentIdPreview(preview);
+                form.setValue(
+                  "studentIdStorageId",
+                  storageId ?? "",
+                  { shouldValidate: true }
+                );
+              }}
+            />
+          ) : null}
           <RegistrationModalFooter className="px-0 pb-0 sm:col-span-2 sm:justify-end">
             <Button
               type="button"

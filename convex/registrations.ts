@@ -48,6 +48,7 @@ export const registerAttendee = mutation({
     phone: v.string(),
     organization: v.optional(v.string()),
     position: v.optional(v.string()),
+    studentIdStorageId: v.optional(v.id("_storage")),
     /** When true, registration is confirmed immediately (e.g. after payment). */
     paymentCompleted: v.optional(v.boolean()),
   },
@@ -72,6 +73,13 @@ export const registerAttendee = mutation({
       throw new Error(
         "This pass type is not available for online registration. Contact the organisers."
       );
+    }
+    if (ticketType.kind === "student") {
+      if (!args.studentIdStorageId) {
+        throw new Error("Upload your student ID to register as a student");
+      }
+    } else if (args.studentIdStorageId) {
+      throw new Error("Student ID upload is only required for student passes");
     }
 
     const email = args.email.trim().toLowerCase();
@@ -111,6 +119,7 @@ export const registerAttendee = mutation({
         phone: args.phone.trim(),
         organization: args.organization?.trim() || undefined,
         position: args.position?.trim() || undefined,
+        studentIdStorageId: args.studentIdStorageId,
         confirmationCode,
         status: paid ? "confirmed" : "pending",
         createdAt: now,
@@ -141,6 +150,7 @@ export const registerAttendee = mutation({
       phone: args.phone.trim(),
       organization: args.organization?.trim() || undefined,
       position: args.position?.trim() || undefined,
+      studentIdStorageId: args.studentIdStorageId,
       confirmationCode,
       status: "waitlisted",
       createdAt: now,
@@ -387,19 +397,25 @@ export const listForAdmin = query({
         .map((c) => [c.registrationId, c])
     );
 
-    const enriched = rows
-      .sort((a, b) => b.createdAt - a.createdAt)
-      .map((r) => {
-        const ticket = ticketById.get(r.ticketTypeId);
-        const cert = certByRegistration.get(r._id);
-        return {
-          ...r,
-          ticketTypeName: ticket?.name ?? r.ticketKind,
-          eventSlug: event.slug,
-          certificateNumber: cert?.certificateNumber ?? null,
-          certificateIssuedAt: cert?.issuedAt ?? null,
-        };
-      });
+    const enriched = await Promise.all(
+      rows
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .map(async (r) => {
+          const ticket = ticketById.get(r.ticketTypeId);
+          const cert = certByRegistration.get(r._id);
+          const studentIdUrl = r.studentIdStorageId
+            ? await ctx.storage.getUrl(r.studentIdStorageId)
+            : null;
+          return {
+            ...r,
+            ticketTypeName: ticket?.name ?? r.ticketKind,
+            eventSlug: event.slug,
+            certificateNumber: cert?.certificateNumber ?? null,
+            certificateIssuedAt: cert?.issuedAt ?? null,
+            studentIdUrl,
+          };
+        })
+    );
 
     return enriched;
   },

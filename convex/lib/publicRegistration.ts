@@ -5,6 +5,7 @@ export const SELF_SERVICE_EXCLUDED_TICKET_KINDS = [
   "sponsor",
   "vip",
   "media",
+  "speaker",
 ] as const;
 
 export type TicketTypeKind = Doc<"ticketTypes">["kind"];

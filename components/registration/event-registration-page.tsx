@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
@@ -24,8 +24,9 @@ import { cn } from "@/lib/utils";
 import { ManualMoMoPaymentInstructions } from "@/components/payments/manual-momo-payment-instructions";
 import { formatPrice } from "@/lib/format-price";
 import type { PublicEventBundle } from "@/lib/event/types";
+import { StudentIdUpload } from "@/components/registration/student-id-upload";
 import {
-  attendeeRegistrationSchema,
+  attendeeRegistrationSchemaForKind,
   type AttendeeRegistrationData,
 } from "@/lib/validations/registration";
 
@@ -34,7 +35,8 @@ const KIND_LABELS: Record<string, string> = {
   vip: "International",
   speaker: "Speaker",
   sponsor: "Sponsor",
-  exhibitor: "Exhibitor",
+  exhibitor: "Exhibition Package",
+  student: "Student",
   media: "Media",
 };
 
@@ -52,12 +54,18 @@ export function EventRegistrationPage({ data }: Props) {
   );
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [studentIdPreview, setStudentIdPreview] = useState<string | null>(null);
 
   const activeTicket =
     ticketTypes.find((t) => t.kind === activeKind) ?? ticketTypes[0];
 
+  const schema = useMemo(
+    () => attendeeRegistrationSchemaForKind(activeKind),
+    [activeKind]
+  );
+
   const form = useForm<AttendeeRegistrationData>({
-    resolver: zodResolver(attendeeRegistrationSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       ticketTypeId: activeTicket?.id ?? "",
       fullName: "",
@@ -65,8 +73,13 @@ export function EventRegistrationPage({ data }: Props) {
       phone: "",
       organization: "",
       position: "",
+      studentIdStorageId: "",
     },
   });
+
+  useEffect(() => {
+    form.clearErrors("studentIdStorageId");
+  }, [activeKind, form]);
 
   function selectKind(kind: string) {
     setActiveKind(kind);
@@ -76,6 +89,8 @@ export function EventRegistrationPage({ data }: Props) {
     }
     setError(null);
     setSuccess(null);
+    setStudentIdPreview(null);
+    form.setValue("studentIdStorageId", "");
   }
 
   async function onSubmit(values: AttendeeRegistrationData) {
@@ -95,6 +110,9 @@ export function EventRegistrationPage({ data }: Props) {
         phone: values.phone,
         organization: values.organization,
         position: values.position,
+        studentIdStorageId: values.studentIdStorageId
+          ? (values.studentIdStorageId as Id<"_storage">)
+          : undefined,
         paymentCompleted: waitlistOnly ? undefined : false,
       });
       if (result.outcome === "waitlisted") {
@@ -118,7 +136,9 @@ export function EventRegistrationPage({ data }: Props) {
         phone: "",
         organization: "",
         position: "",
+        studentIdStorageId: "",
       });
+      setStudentIdPreview(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
     }
@@ -167,6 +187,7 @@ export function EventRegistrationPage({ data }: Props) {
           const spotsLeft = ticket.capacity - ticket.soldCount;
           const tierSoldOut = spotsLeft <= 0;
           const waitlistOnly = eventFull || tierSoldOut;
+          const isStudent = ticket.kind === "student";
 
           return (
             <TabsContent key={ticket.id} value={ticket.kind} className="mt-6">
@@ -255,6 +276,22 @@ export function EventRegistrationPage({ data }: Props) {
                       error={form.formState.errors.position?.message}
                       inputProps={form.register("position")}
                     />
+                    {isStudent && activeKind === ticket.kind ? (
+                      <StudentIdUpload
+                        value={form.watch("studentIdStorageId")}
+                        previewUrl={studentIdPreview}
+                        disabled={form.formState.isSubmitting}
+                        error={form.formState.errors.studentIdStorageId?.message}
+                        onChange={(storageId, preview) => {
+                          setStudentIdPreview(preview);
+                          form.setValue(
+                            "studentIdStorageId",
+                            storageId ?? "",
+                            { shouldValidate: true }
+                          );
+                        }}
+                      />
+                    ) : null}
                     <div className="sm:col-span-2 flex flex-wrap gap-3 pt-2">
                       <Button
                         type="submit"

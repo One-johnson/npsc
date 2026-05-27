@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Check, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format-price";
-import { MANUAL_BANK_PAYMENT } from "@/lib/payments/manual-bank";
 import {
+  formatManualBankPaymentCopy,
+  MANUAL_BANK_PAYMENT,
+} from "@/lib/payments/manual-bank";
+import {
+  formatManualMoMoPaymentCopy,
   MANUAL_MOMO_PAYMENT,
   MANUAL_MOMO_PAYMENT_INSTRUCTIONS,
 } from "@/lib/payments/manual-momo";
@@ -50,37 +54,42 @@ export function ManualMoMoPaymentInstructions({
       ) : null}
       {referenceCode ? (
         <dl className="mt-4">
-          <CopyRow label="Reference (memo)" value={referenceCode} mono />
+          <DetailRow label="Reference (memo)" value={referenceCode} mono />
         </dl>
       ) : null}
 
-      <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        Mobile Money
-      </p>
-      <dl className="mt-2 space-y-3">
-        <CopyRow label="MoMo number" value={MANUAL_MOMO_PAYMENT.number} />
-        <CopyRow
+      <PaymentDetailsSection
+        title="Mobile Money"
+        copyLabel="Mobile Money details"
+        copyText={formatManualMoMoPaymentCopy(referenceCode)}
+      >
+        <DetailRow
+          label="MoMo number"
+          value={MANUAL_MOMO_PAYMENT.numberDisplay}
+        />
+        <DetailRow
           label="Account name"
           value={MANUAL_MOMO_PAYMENT.accountName}
         />
-      </dl>
+      </PaymentDetailsSection>
 
-      <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        Bank transfer
-      </p>
-      <dl className="mt-2 space-y-3">
-        <CopyRow
+      <PaymentDetailsSection
+        title="Bank transfer"
+        copyLabel="Bank details"
+        copyText={formatManualBankPaymentCopy()}
+      >
+        <DetailRow
           label="Account name"
           value={MANUAL_BANK_PAYMENT.accountName}
         />
-        <CopyRow label="Bank name" value={MANUAL_BANK_PAYMENT.bankName} />
-        <CopyRow
+        <DetailRow label="Bank name" value={MANUAL_BANK_PAYMENT.bankName} />
+        <DetailRow
           label="A/C No."
           value={MANUAL_BANK_PAYMENT.accountNumber}
           mono
         />
-        <CopyRow label="Branch" value={MANUAL_BANK_PAYMENT.branch} />
-      </dl>
+        <DetailRow label="Branch" value={MANUAL_BANK_PAYMENT.branch} />
+      </PaymentDetailsSection>
 
       {showSteps ? (
         <ol className="mt-4 list-decimal space-y-1.5 pl-4 text-muted-foreground">
@@ -93,7 +102,58 @@ export function ManualMoMoPaymentInstructions({
   );
 }
 
-function CopyRow({
+function PaymentDetailsSection({
+  title,
+  copyLabel,
+  copyText,
+  children,
+}: {
+  title: string;
+  copyLabel: string;
+  copyText: string;
+  children: ReactNode;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(copyText);
+      setCopied(true);
+      toast.success(`${copyLabel} copied`);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Could not copy — please copy manually");
+    }
+  }
+
+  return (
+    <div className="mt-5">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {title}
+        </p>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-8 shrink-0 gap-1.5"
+          onClick={() => void handleCopy()}
+          aria-label={`Copy ${copyLabel}`}
+        >
+          {copied ? (
+            <Check className="size-3.5" />
+          ) : (
+            <Copy className="size-3.5" />
+          )}
+          Copy
+        </Button>
+      </div>
+      <dl className="mt-2 space-y-3">{children}</dl>
+    </div>
+  );
+}
+
+function DetailRow({
   label,
   value,
   mono,
@@ -102,45 +162,16 @@ function CopyRow({
   value: string;
   mono?: boolean;
 }) {
-  const [copied, setCopied] = useState(false);
-
-  async function handleCopy() {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopied(true);
-      toast.success(`${label} copied`);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      toast.error("Could not copy — please copy manually");
-    }
-  }
-
   return (
     <div className="flex items-start justify-between gap-3">
       <dt className="shrink-0 text-muted-foreground">{label}</dt>
-      <dd className="flex min-w-0 items-center gap-2">
-        <span
-          className={cn(
-            "text-right font-medium text-foreground",
-            mono && "font-mono text-xs"
-          )}
-        >
-          {value}
-        </span>
-        <Button
-          type="button"
-          variant="outline"
-          size="icon-sm"
-          className="shrink-0"
-          onClick={() => void handleCopy()}
-          aria-label={`Copy ${label}`}
-        >
-          {copied ? (
-            <Check className="size-3.5" />
-          ) : (
-            <Copy className="size-3.5" />
-          )}
-        </Button>
+      <dd
+        className={cn(
+          "min-w-0 text-right font-medium text-foreground",
+          mono && "font-mono text-xs"
+        )}
+      >
+        {value}
       </dd>
     </div>
   );

@@ -38,6 +38,7 @@ export type ParticipantRow = {
   eventSlug: string;
   certificateNumber: string | null;
   certificateIssuedAt: number | null;
+  studentIdUrl: string | null;
 };
 
 const KIND_LABELS: Record<string, string> = {
@@ -45,7 +46,8 @@ const KIND_LABELS: Record<string, string> = {
   vip: "International",
   speaker: "Speaker",
   sponsor: "Sponsor",
-  exhibitor: "Exhibitor",
+  exhibitor: "Exhibition Package",
+  student: "Student",
   media: "Media",
 };
 
@@ -104,6 +106,34 @@ export function getParticipantsColumns(
         <DataTableColumnHeader column={column} title="Position" />
       ),
       cell: ({ row }) => row.original.position ?? "—",
+    },
+    {
+      id: "studentId",
+      meta: { label: "Student ID" },
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Student ID" />
+      ),
+      cell: ({ row }) => {
+        if (row.original.ticketKind !== "student") {
+          return <span className="text-muted-foreground">—</span>;
+        }
+        const url = row.original.studentIdUrl;
+        if (!url) {
+          return (
+            <span className="text-xs text-muted-foreground">Not uploaded</span>
+          );
+        }
+        return (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+          >
+            View ID
+          </a>
+        );
+      },
     },
     {
       accessorKey: "email",

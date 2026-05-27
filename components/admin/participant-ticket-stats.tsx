@@ -14,7 +14,8 @@ const KIND_LABELS: Record<string, string> = {
   vip: "International",
   speaker: "Speaker",
   sponsor: "Sponsor",
-  exhibitor: "Exhibitor",
+  exhibitor: "Exhibition Package",
+  student: "Student",
   media: "Media",
 };
 

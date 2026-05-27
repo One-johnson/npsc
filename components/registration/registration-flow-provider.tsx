@@ -135,6 +135,9 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
             phone: data.phone,
             organization: data.organization,
             position: data.position,
+            studentIdStorageId: data.studentIdStorageId
+              ? (data.studentIdStorageId as Id<"_storage">)
+              : undefined,
           });
           setFormDialogOpen(false);
           setSelectedTicket(null);
@@ -167,6 +170,9 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
             phone: data.phone,
             organization: data.organization,
             position: data.position,
+            studentIdStorageId: data.studentIdStorageId
+              ? (data.studentIdStorageId as Id<"_storage">)
+              : undefined,
             paymentCompleted: false,
           });
           setFormDialogOpen(false);
@@ -261,6 +267,7 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
                   organization: pending.organization,
                   position: pending.position,
                   ticketTypeId: pending.ticketTypeId,
+                  studentIdStorageId: pending.studentIdStorageId,
                 }
               : undefined
           }

@@ -40,7 +40,7 @@ export function TicketTypesPanel({ eventId }: { eventId: Id<"events"> }) {
       <div>
         <h2 className="text-lg font-semibold">Ticket types</h2>
         <p className="text-sm text-muted-foreground">
-          Participant, International, Speaker, Sponsor, Exhibitor, Media, and more.
+          Participant, Student, Exhibition Package, International, Speaker, Sponsor, Media, and more.
         </p>
       </div>
       <div className="overflow-hidden rounded-xl border border-border">

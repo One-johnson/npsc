@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +31,8 @@ const KIND_LABELS: Record<string, string> = {
   vip: "International",
   speaker: "Speaker",
   sponsor: "Sponsor",
-  exhibitor: "Exhibitor",
+  exhibitor: "Exhibition Package",
+  student: "Student",
   media: "Media",
 };
 
@@ -89,6 +91,25 @@ export function RegistrationDetailSheet({
                 value={participant.organization ?? "—"}
               />
               <DetailRow label="Position" value={participant.position ?? "—"} />
+              {participant.ticketKind === "student" ? (
+                <DetailRow
+                  label="Student ID"
+                  value={
+                    participant.studentIdUrl ? (
+                      <a
+                        href={participant.studentIdUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium text-primary underline-offset-4 hover:underline"
+                      >
+                        View uploaded ID
+                      </a>
+                    ) : (
+                      "Not uploaded"
+                    )
+                  }
+                />
+              ) : null}
               <DetailRow label="Pass type" value={participant.ticketTypeName} />
               <DetailRow
                 label="Reference"
@@ -176,7 +197,7 @@ function DetailRow({
   mono,
 }: {
   label: string;
-  value: string;
+  value: ReactNode;
   mono?: boolean;
 }) {
   return (

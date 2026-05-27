@@ -12,6 +12,7 @@ export const ticketTypeKindValidator = v.union(
   v.literal("speaker"),
   v.literal("sponsor"),
   v.literal("exhibitor"),
+  v.literal("student"),
   v.literal("media")
 );
 
@@ -170,6 +171,8 @@ export default defineSchema({
     phone: v.string(),
     organization: v.optional(v.string()),
     position: v.optional(v.string()),
+    /** Uploaded student ID card (student pass only). */
+    studentIdStorageId: v.optional(v.id("_storage")),
     confirmationCode: v.string(),
     status: v.union(
       v.literal("pending"),

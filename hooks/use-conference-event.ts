@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { mockEvent } from "@/lib/mock-event";
@@ -106,16 +106,26 @@ export function useConferenceEvent(slug: string = mockEvent.slug): {
     convexUrl ? { slug: resolvedSlug } : "skip"
   );
 
+  const slugQueryReady = !useDefaultSlug || publishedSlug !== undefined;
+  const eventQueryReady = data !== undefined;
+  const queriesReady = slugQueryReady && eventQueryReady;
+
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(!convexUrl);
+
+  useEffect(() => {
+    if (queriesReady) {
+      setHasLoadedOnce(true);
+    }
+  }, [queriesReady]);
+
+  const isLoading = Boolean(convexUrl) && !hasLoadedOnce;
+
   if (!convexUrl) {
     return { bundle: fallback, isLoading: false };
   }
 
-  if (useDefaultSlug && publishedSlug === undefined) {
-    return { bundle: fallback, isLoading: true };
-  }
-
-  if (data === undefined) {
-    return { bundle: fallback, isLoading: true };
+  if (!queriesReady) {
+    return { bundle: fallback, isLoading };
   }
 
   if (data === null) {

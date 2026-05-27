@@ -12,7 +12,19 @@ export const attendeeRegistrationSchema = z.object({
     .string()
     .min(1, "Enter your company or organization"),
   position: z.string().min(1, "Enter your position or job title"),
+  studentIdStorageId: z.string().optional(),
 });
+
+export function attendeeRegistrationSchemaForKind(ticketKind: string) {
+  if (ticketKind !== "student") {
+    return attendeeRegistrationSchema;
+  }
+  return attendeeRegistrationSchema.extend({
+    studentIdStorageId: z
+      .string()
+      .min(1, "Upload a photo of your student ID"),
+  });
+}
 
 export const staffRegistrationSchema = z.object({
   name: z.string().min(2, "Enter your full name"),

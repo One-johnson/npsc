@@ -124,13 +124,35 @@ const NPSC_SEED = {
     {
       slug: "exhibitor",
       kind: "exhibitor" as const,
-      name: "Exhibitor",
-      description: "Exhibition booth staff passes.",
-      price: 1500,
+      name: "Exhibition Package",
+      description:
+        "Two-day exhibition package. Space allocation only — branding and booth customization excluded.",
+      price: 5000,
       currency: "GHS",
       capacity: 120,
-      perks: ["Exhibition booth space", "2 staff passes"],
+      perks: [
+        "One exhibition booth",
+        "Meals for one representative",
+        "One table and two chairs",
+        "Space allocation only (branding and booth customization excluded)",
+      ],
       sortOrder: 4,
+    },
+    {
+      slug: "student",
+      kind: "student" as const,
+      name: "Student",
+      description:
+        "Student pass for enrolled students (GHS 200). Upload a valid student ID when registering.",
+      price: 200,
+      currency: "GHS",
+      capacity: 200,
+      perks: [
+        "Full 2-day access",
+        "Student networking session",
+        "Certificate of attendance",
+      ],
+      sortOrder: 5,
     },
     {
       slug: "media",
@@ -141,7 +163,7 @@ const NPSC_SEED = {
       currency: "GHS",
       capacity: 30,
       perks: ["Press gallery access", "Media kit"],
-      sortOrder: 5,
+      sortOrder: 6,
     },
   ],
 };
@@ -274,9 +296,11 @@ export const syncNpscTicketCatalog = mutation({
     const updated: string[] = [];
     const now = Date.now();
 
+    const syncSlugs = new Set(["participant", "vip", "exhibitor", "student"]);
+
     for (const ticket of tickets) {
       const defaults = catalogBySlug.get(ticket.slug);
-      if (!defaults || (ticket.slug !== "participant" && ticket.slug !== "vip")) {
+      if (!defaults || !syncSlugs.has(ticket.slug)) {
         continue;
       }
       await ctx.db.patch(ticket._id, {
@@ -287,6 +311,20 @@ export const syncNpscTicketCatalog = mutation({
         updatedAt: now,
       });
       updated.push(ticket.slug);
+    }
+
+    const existingSlugs = new Set(tickets.map((t) => t.slug));
+    const studentDefaults = catalogBySlug.get("student");
+    if (studentDefaults && !existingSlugs.has("student")) {
+      await ctx.db.insert("ticketTypes", {
+        eventId: event._id,
+        ...studentDefaults,
+        soldCount: 0,
+        isActive: true,
+        createdAt: now,
+        updatedAt: now,
+      });
+      updated.push("student (created)");
     }
 
     return { eventSlug: event.slug, updated };
