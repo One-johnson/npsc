@@ -153,8 +153,8 @@ export const mockEvent: MockEvent = {
     },
     {
       icon: "credit-card",
-      title: "Mobile Money payment",
-      description: "Pay via MoMo to GIPS after registering — card and bank checkout coming soon.",
+      title: "Flexible payment",
+      description: "Pay via Mobile Money or bank transfer to GIPS after registering online.",
     },
     {
       icon: "award",
@@ -197,8 +197,8 @@ export const mockEvent: MockEvent = {
     },
     {
       step: 2,
-      title: "Pay via Mobile Money",
-      description: "Send the pass fee to GIPS using the MoMo number on the registration page.",
+      title: "Complete your payment",
+      description: "Send the pass fee to GIPS via Mobile Money or bank transfer using the details on the registration page.",
     },
     {
       step: 3,
@@ -225,7 +225,7 @@ export const mockEvent: MockEvent = {
     {
       question: "What payment methods are accepted?",
       answer:
-        "Mobile Money only for now (MTN, Telecel, AirtelTigo) to 020 168 9882 — Ghana Institute of Procurement and Supply. Include your registration reference in the payment memo. Card and bank checkout via Hubtel will be enabled when approved.",
+        "Mobile Money (MTN, Telecel, AirtelTigo) to 020 168 9882, or bank transfer to ADB account 1161000112225801 — Ghana Institute of Procurement and Supply, ADB House. Include your registration reference in the payment memo.",
     },
     {
       question: "Will I receive a certificate?",

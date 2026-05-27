@@ -59,7 +59,7 @@ export function PaymentDialog({
           showSteps
         />
         <p className="text-xs text-muted-foreground">
-          Your registration stays pending until GIPS verifies your MoMo payment.
+          Your registration stays pending until GIPS verifies your payment.
           Keep your reference code to check status later.
         </p>
 

@@ -33,7 +33,7 @@ const COPY: Record<
   "redirecting-to-payment": {
     title: "Registration saved",
     description:
-      "Redirecting you to Mobile Money payment details and your reference code.",
+      "Redirecting you to payment details and your reference code.",
   },
   "processing-payment": {
     title: "Saving registration",
@@ -42,7 +42,7 @@ const COPY: Record<
   "payment-success": {
     title: "Registration saved",
     description:
-      "Send your pass fee via Mobile Money using the details on the next screen. GIPS will confirm after verification.",
+      "Send your pass fee via Mobile Money or bank transfer using the details on the next screen. GIPS will confirm after verification.",
   },
   "waitlist-complete": {
     title: "You’re on the waitlist",
@@ -88,7 +88,7 @@ export function RegistrationFlowOverlay({ state }: Props) {
           <DialogDescription className="text-base leading-relaxed">
             {description}
           </DialogDescription>
-          {state.phase === "payment-success" && state.confirmationCode ? (
+          {state.phase !== "registering" && state.confirmationCode ? (
             <p className="text-sm text-muted-foreground">
               Reference{" "}
               <span className="font-mono font-medium text-foreground">

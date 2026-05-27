@@ -7,6 +7,8 @@ import { IconField } from "@/components/auth/icon-field";
 import { PasswordField } from "@/components/auth/password-field";
 import { Button } from "@/components/ui/button";
 import { useStaffSession } from "@/components/auth/session-provider";
+import { parseJsonResponse } from "@/lib/http/parse-json-response";
+import type { StaffUser } from "@/lib/auth/types";
 
 export function LoginForm() {
   const router = useRouter();
@@ -37,9 +39,17 @@ export function LoginForm() {
         credentials: "include",
         body: JSON.stringify({ email: identifier, password }),
       });
-      const data = await res.json();
+      const data = await parseJsonResponse<{
+        error?: string;
+        user: StaffUser;
+        sessionToken: string;
+      }>(res);
       if (!res.ok) {
-        setError(data.error ?? "Login failed");
+        setError(data?.error ?? "Login failed");
+        return;
+      }
+      if (!data?.user || !data.sessionToken) {
+        setError("Invalid response from server. Try again.");
         return;
       }
       setSession({

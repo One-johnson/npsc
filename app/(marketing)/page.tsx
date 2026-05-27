@@ -6,7 +6,6 @@ import { WhyAttend } from "@/components/marketing/why-attend";
 import { FeatureGrid } from "@/components/marketing/feature-grid";
 import { AudienceCarousel } from "@/components/marketing/audience-carousel";
 import { StepsTimeline } from "@/components/marketing/steps-timeline";
-import { SchedulePreview } from "@/components/marketing/schedule-preview";
 import { PricingTeaser } from "@/components/marketing/pricing-teaser";
 import { FaqAccordion } from "@/components/marketing/faq-accordion";
 import { CtaBand } from "@/components/marketing/cta-band";

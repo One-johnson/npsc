@@ -139,7 +139,10 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
           setFormDialogOpen(false);
           setSelectedTicket(null);
           clearPendingRegistration();
-          setOverlay({ phase: "waitlist-complete" });
+          setOverlay({
+            phase: "waitlist-complete",
+            confirmationCode: result.confirmationCode,
+          });
           await delay(1800);
           setOverlay(null);
           goToRegistrationStatus(result.confirmationCode);
@@ -169,13 +172,19 @@ export function RegistrationFlowProvider({ children }: { children: ReactNode }) 
           setFormDialogOpen(false);
           setSelectedTicket(null);
           if (result.outcome === "waitlisted") {
-            setOverlay({ phase: "waitlist-complete" });
+            setOverlay({
+              phase: "waitlist-complete",
+              confirmationCode: result.confirmationCode,
+            });
             await delay(1800);
             setOverlay(null);
             goToRegistrationStatus(result.confirmationCode);
             return;
           }
-          setOverlay({ phase: "redirecting-to-payment" });
+          setOverlay({
+            phase: "redirecting-to-payment",
+            confirmationCode: result.confirmationCode,
+          });
           await delay(1400);
           setOverlay(null);
           goToRegistrationStatus(result.confirmationCode);

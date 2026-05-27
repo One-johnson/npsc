@@ -5,6 +5,7 @@ import { Check, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format-price";
+import { MANUAL_BANK_PAYMENT } from "@/lib/payments/manual-bank";
 import {
   MANUAL_MOMO_PAYMENT,
   MANUAL_MOMO_PAYMENT_INSTRUCTIONS,
@@ -33,29 +34,52 @@ export function ManualMoMoPaymentInstructions({
         className
       )}
     >
-      <p className="font-semibold text-foreground">Pay with Mobile Money</p>
+      <p className="font-semibold text-foreground">Payment details</p>
       <p className="mt-1 text-muted-foreground">
-        Online card and bank checkout is coming soon. For now, send payment to
-        the account below ({MANUAL_MOMO_PAYMENT.networks}).
+        Pay via Mobile Money ({MANUAL_MOMO_PAYMENT.networks}) or bank transfer.
+        Include your registration reference in the payment memo.
       </p>
 
-      <dl className="mt-4 space-y-3">
+      {amount !== undefined && amount > 0 ? (
+        <div className="mt-4 flex items-start justify-between gap-3 text-sm">
+          <span className="text-muted-foreground">Amount</span>
+          <span className="font-semibold text-foreground">
+            {formatPrice(amount, currency)}
+          </span>
+        </div>
+      ) : null}
+      {referenceCode ? (
+        <dl className="mt-4">
+          <CopyRow label="Reference (memo)" value={referenceCode} mono />
+        </dl>
+      ) : null}
+
+      <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Mobile Money
+      </p>
+      <dl className="mt-2 space-y-3">
         <CopyRow label="MoMo number" value={MANUAL_MOMO_PAYMENT.number} />
         <CopyRow
           label="Account name"
           value={MANUAL_MOMO_PAYMENT.accountName}
         />
-        {amount !== undefined && amount > 0 ? (
-          <div className="flex items-start justify-between gap-3">
-            <dt className="text-muted-foreground">Amount</dt>
-            <dd className="text-right font-semibold text-foreground">
-              {formatPrice(amount, currency)}
-            </dd>
-          </div>
-        ) : null}
-        {referenceCode ? (
-          <CopyRow label="Reference (memo)" value={referenceCode} mono />
-        ) : null}
+      </dl>
+
+      <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Bank transfer
+      </p>
+      <dl className="mt-2 space-y-3">
+        <CopyRow
+          label="Account name"
+          value={MANUAL_BANK_PAYMENT.accountName}
+        />
+        <CopyRow label="Bank name" value={MANUAL_BANK_PAYMENT.bankName} />
+        <CopyRow
+          label="A/C No."
+          value={MANUAL_BANK_PAYMENT.accountNumber}
+          mono
+        />
+        <CopyRow label="Branch" value={MANUAL_BANK_PAYMENT.branch} />
       </dl>
 
       {showSteps ? (
