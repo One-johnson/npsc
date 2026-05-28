@@ -38,7 +38,7 @@ export function Gallery() {
   }, []);
 
   return (
-    <section className="py-16 md:py-24">
+    <section id="gallery" className="py-16 md:py-24">
       <div className="container mx-auto max-w-6xl px-4 md:px-6">
         <SectionHeading
           eyebrow="Gallery"

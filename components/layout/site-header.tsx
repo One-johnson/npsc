@@ -14,6 +14,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 const navLinks = [
   { href: "#about", label: "About" },
   { href: "#schedule", label: "Programme" },
+  { href: "#gallery", label: "Gallery" },
   { href: "#register", label: "Register" },
   { href: "#faq", label: "FAQ" },
 ];
