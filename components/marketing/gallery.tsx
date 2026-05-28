@@ -3,16 +3,32 @@
 import { useCallback, useMemo, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Images } from "lucide-react";
+import { Images } from "lucide-react";
+import Lightbox from "yet-another-react-lightbox";
+import Captions from "yet-another-react-lightbox/plugins/captions";
+import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
+import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
+import "yet-another-react-lightbox/styles.css";
+import "yet-another-react-lightbox/plugins/captions.css";
+import "yet-another-react-lightbox/plugins/thumbnails.css";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import { SectionHeading } from "@/components/marketing/section-heading";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { fadeUp, staggerContainer } from "@/components/motion";
 import { GALLERY_IMAGES } from "@/lib/marketing/gallery";
 
 export function Gallery() {
   const images = useMemo(() => GALLERY_IMAGES, []);
+  const previewImages = useMemo(() => images.slice(0, 12), [images]);
+  const slides = useMemo(
+    () =>
+      images.map((img) => ({
+        src: img.src,
+        alt: img.alt,
+        title: img.caption ?? img.alt,
+      })),
+    [images]
+  );
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -20,16 +36,6 @@ export function Gallery() {
     setActiveIndex(idx);
     setOpen(true);
   }, []);
-
-  const prev = useCallback(() => {
-    setActiveIndex((i) => (i - 1 + images.length) % images.length);
-  }, [images.length]);
-
-  const next = useCallback(() => {
-    setActiveIndex((i) => (i + 1) % images.length);
-  }, [images.length]);
-
-  const active = images[activeIndex];
 
   return (
     <section className="py-16 md:py-24">
@@ -47,7 +53,7 @@ export function Gallery() {
           viewport={{ once: true, margin: "-80px" }}
           className="mt-10 grid gap-4 md:grid-cols-4"
         >
-          {images.map((img, idx) => {
+          {previewImages.map((img, idx) => {
             const tileClass =
               idx === 0
                 ? "md:col-span-2 md:row-span-2"
@@ -102,102 +108,23 @@ export function Gallery() {
           })}
         </motion.div>
 
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent
-            showCloseButton
-            className="w-[calc(100vw-2rem)] max-w-[72rem] sm:max-w-[min(100vw-2rem,72rem)] p-0 h-[calc(100svh-2rem)] overflow-hidden"
-          >
-            <div className="grid h-full gap-0 lg:grid-cols-[1fr_auto]">
-              <div className="flex h-full min-h-0 flex-col bg-black">
-                <div className="relative flex flex-1 items-center justify-center">
-                  {active ? (
-                    <Image
-                      src={active.src}
-                      alt={active.alt}
-                      fill
-                      sizes="(min-width: 1024px) 900px, 100vw"
-                      className="object-contain object-center"
-                    />
-                  ) : null}
-                </div>
-
-                {/* Mobile thumbnail strip */}
-                <div className="border-t border-white/10 bg-black/95 p-3 lg:hidden">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-semibold text-white/80">
-                      {activeIndex + 1} / {images.length}
-                    </p>
-                  </div>
-                  <div className="mt-2 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                    {images.map((img, idx) => (
-                      <button
-                        key={img.src}
-                        type="button"
-                        onClick={() => setActiveIndex(idx)}
-                        className={cn(
-                          "shrink-0 overflow-hidden rounded-md border transition",
-                          idx === activeIndex
-                            ? "border-white ring-2 ring-white/25"
-                            : "border-white/20 opacity-80 hover:opacity-100"
-                        )}
-                        aria-label={`Open photo ${idx + 1}`}
-                      >
-                        <div className="relative h-14 w-24">
-                          <Image
-                            src={img.src}
-                            alt={img.alt}
-                            fill
-                            sizes="96px"
-                            className="object-cover object-top"
-                          />
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="hidden h-full w-56 border-l border-border bg-background p-3 lg:flex lg:min-h-0 lg:flex-col">
-                <p className="text-xs font-semibold text-muted-foreground">
-                  {activeIndex + 1} / {images.length}
-                </p>
-                {active?.caption ? (
-                  <p className="mt-1 line-clamp-2 text-sm font-semibold text-foreground">
-                    {active.caption}
-                  </p>
-                ) : null}
-                <div className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
-                  <div className="grid gap-2">
-                  {images.map((img, idx) => (
-                    <button
-                      key={img.src}
-                      type="button"
-                      onClick={() => setActiveIndex(idx)}
-                      className={cn(
-                        "group relative overflow-hidden rounded-lg border transition",
-                        idx === activeIndex
-                          ? "border-primary ring-2 ring-primary/20"
-                          : "border-border hover:border-primary/40"
-                      )}
-                      aria-label={`Open photo ${idx + 1}`}
-                    >
-                      <div className="relative aspect-[16/10]">
-                        <Image
-                          src={img.src}
-                          alt={img.alt}
-                          fill
-                          sizes="224px"
-                          className="object-cover object-top transition-transform duration-200 group-hover:scale-[1.02]"
-                        />
-                      </div>
-                    </button>
-                  ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <Lightbox
+          open={open}
+          close={() => setOpen(false)}
+          index={activeIndex}
+          slides={slides}
+          plugins={[Captions, Thumbnails, Zoom, Slideshow]}
+          captions={{ showToggle: true }}
+          slideshow={{ autoplay: true, delay: 4500 }}
+          thumbnails={{
+            position: "bottom",
+            showToggle: true,
+            vignette: true,
+          }}
+          on={{
+            view: ({ index }) => setActiveIndex(index),
+          }}
+        />
       </div>
     </section>
   );
