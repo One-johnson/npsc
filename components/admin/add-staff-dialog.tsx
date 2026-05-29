@@ -30,6 +30,11 @@ const ASSIGNABLE_ROLES: {
   description: string;
 }[] = [
   {
+    value: "admin",
+    label: "Administrator",
+    description: "Full access to events, staff, participants, and payments.",
+  },
+  {
     value: "finance",
     label: "Finance",
     description: "Payments, refunds, and financial reports.",
@@ -58,7 +63,7 @@ export function AddStaffDialog({
   const [email, setEmail] = useState("");
   const [contact, setContact] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<StaffRole>("finance");
+  const [role, setRole] = useState<StaffRole>("admin");
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<CreatedStaff | null>(null);
   const [loading, setLoading] = useState(false);
@@ -68,7 +73,7 @@ export function AddStaffDialog({
     setEmail("");
     setContact("");
     setPassword("");
-    setRole("finance");
+    setRole("admin");
     setError(null);
     setCreated(null);
   }
@@ -104,7 +109,7 @@ export function AddStaffDialog({
       setEmail("");
       setContact("");
       setPassword("");
-      setRole("finance");
+      setRole("admin");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create user");
     } finally {
@@ -118,8 +123,9 @@ export function AddStaffDialog({
         <DialogHeader>
           <DialogTitle>Add staff member</DialogTitle>
           <DialogDescription>
-            Create a finance account. They receive a unique staff ID (
-            <span className="font-mono">npsc####</span>) for sign-in.
+            Create an administrator or finance account. Each person receives a
+            unique staff ID (<span className="font-mono">npsc####</span>) for
+            sign-in.
           </DialogDescription>
         </DialogHeader>
         {created ? (

@@ -30,7 +30,7 @@ const ROLE_LABELS: Record<StaffRole, string> = {
   finance: "Finance",
 };
 
-const ASSIGNABLE_ROLES: StaffRole[] = ["finance"];
+const EDITABLE_ROLES: StaffRole[] = ["admin", "finance"];
 
 type StaffColumnsOptions = {
   currentUserId?: Id<"users">;
@@ -145,8 +145,10 @@ export function getStaffColumns({
         const member = row.original;
         const isUpdating = updatingUserId === member._id;
 
-        if (member.role === "admin") {
-          return <Badge variant="secondary">{ROLE_LABELS.admin}</Badge>;
+        if (member._id === currentUserId) {
+          return (
+            <Badge variant="secondary">{ROLE_LABELS[member.role]}</Badge>
+          );
         }
 
         return (
@@ -161,7 +163,7 @@ export function getStaffColumns({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {ASSIGNABLE_ROLES.map((r) => (
+              {EDITABLE_ROLES.map((r) => (
                 <SelectItem key={r} value={r}>
                   {ROLE_LABELS[r]}
                 </SelectItem>

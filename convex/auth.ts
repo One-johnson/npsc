@@ -1,5 +1,7 @@
+import type { GenericMutationCtx } from "convex/server";
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import type { DataModel } from "./_generated/dataModel";
 import { hashPassword, verifyPassword } from "./lib/password";
 import {
   createSession,
@@ -15,6 +17,13 @@ import {
 } from "./lib/staffId";
 import { insertStaffUser } from "./lib/staffUsers";
 import { userRoleValidator } from "./schema";
+
+type MutationCtx = GenericMutationCtx<DataModel>;
+
+async function countActiveAdmins(ctx: MutationCtx) {
+  const users = await ctx.db.query("users").collect();
+  return users.filter((u) => u.role === "admin" && u.isActive).length;
+}
 
 export const login = mutation({
   args: {
@@ -124,11 +133,6 @@ export const createStaffUser = mutation({
   },
   handler: async (ctx, args) => {
     await requireRole(ctx, args.sessionToken, ["admin"]);
-    if (args.role === "admin") {
-      throw new Error(
-        "Additional admin accounts cannot be created here. Use platform setup."
-      );
-    }
     return await insertStaffUser(ctx, {
       email: args.email,
       name: args.name,
@@ -157,12 +161,25 @@ export const updateStaffUser = mutation({
     if (user._id === admin._id && args.isActive === false) {
       throw new Error("You cannot deactivate your own account");
     }
-    if (args.role !== undefined) {
-      if (args.role === "admin") {
-        throw new Error("Admin role cannot be assigned here");
+    if (
+      args.isActive === false &&
+      user.role === "admin" &&
+      user.isActive
+    ) {
+      const adminCount = await countActiveAdmins(ctx);
+      if (adminCount <= 1) {
+        throw new Error("Cannot deactivate the last administrator");
       }
-      if (user.role === "admin") {
-        throw new Error("Admin role cannot be changed");
+    }
+    if (args.role !== undefined) {
+      if (user._id === admin._id) {
+        throw new Error("You cannot change your own role");
+      }
+      if (user.role === "admin" && args.role !== "admin") {
+        const adminCount = await countActiveAdmins(ctx);
+        if (adminCount <= 1) {
+          throw new Error("Cannot change the role of the last administrator");
+        }
       }
     }
     const contact =
