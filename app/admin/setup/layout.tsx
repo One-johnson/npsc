@@ -1,4 +1,5 @@
 import { SessionProvider } from "@/components/auth/session-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 /** Setup is reachable before login; no AdminShell. */
 export default function SetupLayout({
@@ -6,5 +7,10 @@ export default function SetupLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <SessionProvider>{children}</SessionProvider>;
+  return (
+    <SessionProvider>
+      {children}
+      <Toaster />
+    </SessionProvider>
+  );
 }
