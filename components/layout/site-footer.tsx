@@ -48,7 +48,21 @@ export function SiteFooter() {
               </a>
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              support@gipsghana.com
+              <a
+                href="mailto:info@gipsghana.com"
+                className="hover:text-foreground"
+              >
+                info@gipsghana.com
+              </a>
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Office of the Vice President, GIPS —{" "}
+              <a
+                href="tel:+233545305678"
+                className="hover:text-foreground"
+              >
+                0545305678
+              </a>
             </p>
           </div>
         </div>

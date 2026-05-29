@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
 import { Lock, Mail, User } from "lucide-react";
+import { toast } from "sonner";
 import { api } from "@/convex/_generated/api";
 import { IconField } from "@/components/auth/icon-field";
 import { PasswordField } from "@/components/auth/password-field";
 import { Button } from "@/components/ui/button";
+import { formatConvexErrorMessage } from "@/lib/convex/error-message";
 
 export function SetupPanel() {
   const router = useRouter();
@@ -41,7 +44,7 @@ export function SetupPanel() {
         `/login?setup=1&staffId=${encodeURIComponent(res.adminStaffId)}`
       );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Setup failed");
+      toast.error(formatConvexErrorMessage(err, "Setup failed"));
     } finally {
       setLoading(false);
     }
@@ -112,15 +115,16 @@ export function SetupPanel() {
         required
       />
 
-      {error ? (
-        <p className="text-sm text-destructive" role="alert">
-          {error}
-        </p>
-      ) : null}
-
       <Button type="submit" disabled={loading} className="h-11 w-full">
         {loading ? "Creating account…" : "Create account & continue"}
       </Button>
+
+      <p className="text-center text-sm text-muted-foreground">
+        Already have an account?{" "}
+        <Link href="/login" className="font-medium text-primary hover:underline">
+          Sign in
+        </Link>
+      </p>
     </form>
   );
 }

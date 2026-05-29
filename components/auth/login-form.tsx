@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { IdCard, Lock } from "lucide-react";
+import { toast } from "sonner";
 import { IconField } from "@/components/auth/icon-field";
 import { PasswordField } from "@/components/auth/password-field";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,6 @@ export function LoginForm() {
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -30,7 +30,6 @@ export function LoginForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
     setLoading(true);
     try {
       const res = await fetch("/api/auth/login", {
@@ -45,11 +44,11 @@ export function LoginForm() {
         sessionToken: string;
       }>(res);
       if (!res.ok) {
-        setError(data?.error ?? "Login failed");
+        toast.error(data?.error ?? "Login failed");
         return;
       }
       if (!data?.user || !data.sessionToken) {
-        setError("Invalid response from server. Try again.");
+        toast.error("Invalid response from server. Try again.");
         return;
       }
       setSession({
@@ -60,7 +59,7 @@ export function LoginForm() {
       router.push(next);
       router.refresh();
     } catch {
-      setError("Unable to connect. Try again.");
+      toast.error("Unable to connect. Try again.");
     } finally {
       setLoading(false);
     }
@@ -111,12 +110,6 @@ export function LoginForm() {
         placeholder="Enter your password"
         required
       />
-
-      {error ? (
-        <p className="text-sm text-destructive" role="alert">
-          {error}
-        </p>
-      ) : null}
 
       <Button type="submit" className="h-11 w-full" disabled={loading}>
         {loading ? "Signing in…" : "Sign in"}
