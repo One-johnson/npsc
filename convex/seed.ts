@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { hashPassword } from "./lib/password";
-import { ensureUserStaffId, generateUniqueStaffId } from "./lib/staffId";
+import { ensureUserStaffId } from "./lib/staffId";
+import { insertStaffUser } from "./lib/staffUsers";
 
 const NPSC_SEED = {
   organization: {
@@ -177,11 +177,6 @@ export const bootstrap = mutation({
     adminName: v.string(),
   },
   handler: async (ctx, args) => {
-    const existingUsers = await ctx.db.query("users").first();
-    if (existingUsers) {
-      throw new Error("Database already seeded. Sign in at /login.");
-    }
-
     const expectedSecret = process.env.SEED_SECRET;
     if (args.secret !== undefined) {
       if (!expectedSecret || args.secret !== expectedSecret) {
@@ -197,24 +192,16 @@ export const bootstrap = mutation({
     if (adminName.length < 2) {
       throw new Error("Enter your full name");
     }
-    if (args.adminPassword.length < 8) {
-      throw new Error("Password must be at least 8 characters");
-    }
+
+    const { userId: adminId, staffId: adminStaffId, email } =
+      await insertStaffUser(ctx, {
+        email: adminEmail,
+        name: adminName,
+        password: args.adminPassword,
+        role: "admin",
+      });
 
     const now = Date.now();
-    const passwordHash = hashPassword(args.adminPassword);
-    const adminStaffId = await generateUniqueStaffId(ctx);
-
-    const adminId = await ctx.db.insert("users", {
-      email: adminEmail,
-      name: adminName,
-      staffId: adminStaffId,
-      passwordHash,
-      role: "admin",
-      isActive: true,
-      createdAt: now,
-      updatedAt: now,
-    });
 
     let org = await ctx.db
       .query("organizations")
@@ -258,7 +245,7 @@ export const bootstrap = mutation({
 
     return {
       adminId,
-      adminEmail,
+      adminEmail: email,
       adminStaffId,
       organizationId: org._id,
       eventId: event._id,

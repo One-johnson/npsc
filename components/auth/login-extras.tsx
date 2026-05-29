@@ -9,15 +9,12 @@ export function LoginExtras() {
 
   return (
     <p className="mt-5 border-t border-border/60 pt-4 text-center text-sm text-muted-foreground">
-      {seeded?.seeded === false ? (
-        <>
-          First time here?{" "}
-          <Link href="/admin/setup" className="text-primary hover:underline">
-            Create administrator account
-          </Link>
-          {" · "}
-        </>
-      ) : null}
+      <Link href="/admin/setup" className="text-primary hover:underline">
+        {seeded?.seeded === false
+          ? "Create administrator account"
+          : "Add administrator account"}
+      </Link>
+      {" · "}
       <Link href="/" className="text-primary hover:underline">
         Public site
       </Link>

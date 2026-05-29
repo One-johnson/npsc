@@ -9,7 +9,7 @@ export default function SetupPage() {
   return (
     <AuthSplitLayout
       title="Platform setup"
-      description="Create the first administrator account. You will sign in on the next screen with your staff ID or email."
+      description="Create an administrator account for the operations dashboard. You can add more administrators here or from Admin → Staff after signing in."
     >
       <SetupPanel />
     </AuthSplitLayout>
